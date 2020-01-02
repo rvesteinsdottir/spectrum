@@ -13,7 +13,8 @@ public class PuzzleBoardManager : MonoBehaviour
   public Color startColor = new Color(255f/255f, 0/255f, 0/255f);
   public Color endColor = new Color(0/255f, 0/255f, 255f/255f);
   public Color[,] colorArray;
-  public static Vector2[] desiredTilePosition;
+  //public static Vector2[] desiredTilePosition;
+  public Dictionary<Vector3, Color> tilePositions;
 
   // Start is called before the first frame update
   void Start()
@@ -28,7 +29,8 @@ public class PuzzleBoardManager : MonoBehaviour
     int x = 0;
     float gridWidth = cols * tileSize;
     float gridHeight = rows * tileSize;
-    desiredTilePosition = new Vector2[cols * rows];
+    //desiredTilePosition = new Vector2[cols * rows];
+    tilePositions = new Dictionary<Vector3, Color>();
 
     for (int row = 0; row < rows; row++)
     {
@@ -46,12 +48,15 @@ public class PuzzleBoardManager : MonoBehaviour
         //Changes pivot point for tiles is in the center
         tile.transform.position = new Vector2(-gridWidth/2 + tileSize/2 + posX, (gridHeight/2 - tileSize/2)-2 + posY);
         tile.transform.Rotate(0.0f, 0.0f, 50.0f, Space.World);
-        desiredTilePosition[x] = tile.transform.position;
+        //desiredTilePosition[x] = tile.transform.position;
 
         var tileRenderer = tile.GetComponent<Renderer>();
         Color tileColor = colorArray[row, col];
         tile.name = $"{tileColor}";
-        tileRenderer.material.color = tileColor;
+        tileRenderer.material.color = Color.gray;
+        tilePositions.Add(tile.transform.position, tileColor);
+
+
         x += 1;
       }
     }

@@ -15,6 +15,7 @@ public class PuzzlePieceManager : MonoBehaviour
   private Transform[] boardTransform;
   private Hashtable initialPosition;
   //private Vector2[] desiredTilePosition;
+  private Dictionary<Vector3, Color> desiredTilePosition = new Dictionary<Vector3, Color>();
   private Vector2 touchOffset;
   public IList<Color> correctMatches = new List<Color>();
   private bool draggingItem = false;
@@ -31,6 +32,18 @@ public class PuzzlePieceManager : MonoBehaviour
 
   private void Update()
   {   
+    var onetime = false;
+    {
+      if (!onetime)
+      {
+        GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
+        Transform puzzleTransform = puzzleBoard.transform;
+        PuzzleBoardManager existingBoard = puzzleBoard.GetComponent<PuzzleBoardManager>();
+        desiredTilePosition = existingBoard.tilePositions;
+        onetime = true;
+      }
+
+    }
     // excluded " && !locked" here
     if (HasInput)
     {
@@ -105,7 +118,7 @@ public class PuzzlePieceManager : MonoBehaviour
     {
       float xVectorDiff = Mathf.Abs(child.position.x - draggedObject.transform.position.x);
       float yVectorDiff = Mathf.Abs(child.position.y - draggedObject.transform.position.y);
-      if ((child.GetComponent<Renderer>().material.color == draggedObjectColor) && xVectorDiff <= 0.5f && yVectorDiff <= 0.5f)
+      if ((desiredTilePosition[child.position] == draggedObjectColor) && xVectorDiff <= 0.5f && yVectorDiff <= 0.5f)
       {
         if (!correctMatches.Contains(draggedObjectColor))
         {
