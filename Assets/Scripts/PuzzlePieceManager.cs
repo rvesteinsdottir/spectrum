@@ -13,13 +13,14 @@ public class PuzzlePieceManager : MonoBehaviour
 
   // Implementation for having the color snap back if incorrect location
   private Transform[] boardTransform;
-  private Vector2[] initialPosition;
-  private Vector2[] desiredTilePosition;
+  private Hashtable initialPosition;
+  //private Vector2[] desiredTilePosition;
   private Vector2 touchOffset;
-  public bool[] correct;
+  public IList<Color> correctMatches = new List<Color>();
   private bool draggingItem = false;
   private GameObject draggedObject;
   private Transform child;
+  private Vector2 initialLoc;
 
   void Start()
   {
@@ -29,17 +30,7 @@ public class PuzzlePieceManager : MonoBehaviour
   }
 
   private void Update()
-  {
-    var onetime = false;
-
-    if (!onetime)
-    {
-      desiredTilePosition = new Vector2[puzzleRows * puzzleCols];
-      desiredTilePosition = PuzzleBoardManager.desiredTilePosition;
-      onetime = true;
-    }
-
-    
+  {   
     // excluded " && !locked" here
     if (HasInput)
     {
@@ -62,7 +53,7 @@ public class PuzzlePieceManager : MonoBehaviour
     }
   }
 
-  // Method from  Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
+  // Method adapted from Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
   private void DragOrPickUp()
   {
     var inputPosition = CurrentTouchPosition;
@@ -73,7 +64,7 @@ public class PuzzlePieceManager : MonoBehaviour
     }
     else
     {
-      RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.5f);
+      RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f);
 
       if (touches.Length > 0)
       {
@@ -82,9 +73,8 @@ public class PuzzlePieceManager : MonoBehaviour
         {
           draggingItem = true;
           draggedObject = hit.transform.gameObject;
+          initialLoc = draggedObject.transform.position;
 
-          //child = Transform.Find($"{objectColor}");
-          //Debug.Log(child.position);
 
           touchOffset = (Vector2)hit.transform.position - inputPosition;
           draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
@@ -109,20 +99,32 @@ public class PuzzlePieceManager : MonoBehaviour
     GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
     Transform puzzleTransform = puzzleBoard.transform;
     boardTransform = new Transform[puzzleRows * puzzleCols];
+    bool match = false;
 
-    Debug.Log(puzzleTransform.childCount);
     foreach (Transform child in puzzleTransform)
     {
       float xVectorDiff = Mathf.Abs(child.position.x - draggedObject.transform.position.x);
       float yVectorDiff = Mathf.Abs(child.position.y - draggedObject.transform.position.y);
       if ((child.GetComponent<Renderer>().material.color == draggedObjectColor) && xVectorDiff <= 0.5f && yVectorDiff <= 0.5f)
       {
-        Debug.Log("match!!!!");
+        if (!correctMatches.Contains(draggedObjectColor))
+        {
+          draggedObject.transform.position = child.position;
+          correctMatches.Add(draggedObjectColor);
+          match = true;
+        }
       }
+
+      Debug.Log(correctMatches.Count);
     }
 
+    if (match == true)
+    {
+      Debug.Log("match");
+    }
 
     draggingItem = false;
+    match = false;
     draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
   }
 
@@ -154,7 +156,7 @@ public class PuzzlePieceManager : MonoBehaviour
   private void GenerateTiles()
   {
     GameObject referenceTile = (GameObject)Instantiate(Resources.Load("SquareTile"));
-    initialPosition = new Vector2[puzzleCols * puzzleRows];
+    initialPosition = new Hashtable();
 
       for (int i = 0; i < (puzzleCols * puzzleRows); i++)
       {
@@ -172,8 +174,7 @@ public class PuzzlePieceManager : MonoBehaviour
           posY = 4;
         }
 
-        tile.transform.position = new Vector2(posX, posY);
-        initialPosition[i] = tile.transform.position;
+        tile.transform.position = new Vector3(posX, posY, 1f);
 
         var tileRenderer = tile.GetComponent<Renderer>();
 
@@ -183,6 +184,8 @@ public class PuzzlePieceManager : MonoBehaviour
         Color tileColor = colorList[randomIndex];
         colorList.RemoveAt(randomIndex);
         tileRenderer.material.color = tileColor;
+
+        initialPosition.Add(tileColor, tile.transform.position);
       }
 
     Destroy(referenceTile);
