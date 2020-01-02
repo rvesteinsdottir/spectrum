@@ -52,13 +52,12 @@ public class PuzzleBoardManager : MonoBehaviour
     float gridWidth = cols * tileSize;
     float gridHeight = rows * tileSize;
 
-    //pivot point for tiles is in the center
+    //Changes pivot point for tiles is in the center
     transform.position = new Vector2(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2);
   }
 
   public void GenerateColorArray()
   {
-    // currently using only half of the colors intended
     Color tileWidth = ((endColor - startColor)/(cols * rows));
 
     colorArray = new Color[rows, cols];

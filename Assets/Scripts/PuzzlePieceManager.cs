@@ -81,8 +81,8 @@ public class PuzzlePieceManager : MonoBehaviour
     float gridWidth = ((puzzleCols * puzzleRows)/2) * tileSize;
     float gridHeight = tileSize * 2;
 
+    //Changes pivot point for tiles is in the center
     transform.position = new Vector2(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2);
-
 
   }
 }
