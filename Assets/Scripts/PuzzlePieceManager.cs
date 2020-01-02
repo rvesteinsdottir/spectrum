@@ -6,22 +6,17 @@ public class PuzzlePieceManager : MonoBehaviour
 {
   private int puzzleRows;
   private int puzzleCols;
+  private int puzzleSize;
   private Color startColor;
   private Color endColor;
   private IList<Color> colorList;
   private float tileSize = 1f;
-
-  // Implementation for having the color snap back if incorrect location
-  private Transform[] boardTransform;
   private Hashtable initialPosition;
-  //private Vector2[] desiredTilePosition;
   private Dictionary<Vector3, Color> desiredTilePosition = new Dictionary<Vector3, Color>();
   private Vector2 touchOffset;
-  public IList<Color> correctMatches = new List<Color>();
   private bool draggingItem = false;
   private GameObject draggedObject;
-  private Transform child;
-  private Vector2 initialLoc;
+  public IList<Color> correctMatches = new List<Color>();
 
   void Start()
   {
@@ -34,6 +29,7 @@ public class PuzzlePieceManager : MonoBehaviour
   {   
     var onetime = false;
     {
+      // Store Dictionary of desired tile position
       if (!onetime)
       {
         GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
@@ -42,9 +38,8 @@ public class PuzzlePieceManager : MonoBehaviour
         desiredTilePosition = existingBoard.tilePositions;
         onetime = true;
       }
-
     }
-    // excluded " && !locked" here
+
     if (HasInput)
     {
       DragOrPickUp();
@@ -86,8 +81,6 @@ public class PuzzlePieceManager : MonoBehaviour
         {
           draggingItem = true;
           draggedObject = hit.transform.gameObject;
-          initialLoc = draggedObject.transform.position;
-
 
           touchOffset = (Vector2)hit.transform.position - inputPosition;
           draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
@@ -106,38 +99,28 @@ public class PuzzlePieceManager : MonoBehaviour
 
   void DropItem()
   {
-
-    var draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
-
     GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
     Transform puzzleTransform = puzzleBoard.transform;
-    boardTransform = new Transform[puzzleRows * puzzleCols];
-    bool match = false;
+    Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
+    bool objectMatch = false;
 
     foreach (Transform child in puzzleTransform)
     {
-      float xVectorDiff = Mathf.Abs(child.position.x - draggedObject.transform.position.x);
-      float yVectorDiff = Mathf.Abs(child.position.y - draggedObject.transform.position.y);
-      if ((desiredTilePosition[child.position] == draggedObjectColor) && xVectorDiff <= 0.5f && yVectorDiff <= 0.5f)
+      float xDiff = Mathf.Abs(child.position.x - draggedObject.transform.position.x);
+      float yDiff = Mathf.Abs(child.position.y - draggedObject.transform.position.y);
+
+      if ((desiredTilePosition[child.position] == draggedObjectColor) && xDiff <= 0.5f && yDiff <= 0.5f && !correctMatches.Contains(draggedObjectColor))
       {
-        if (!correctMatches.Contains(draggedObjectColor))
-        {
-          draggedObject.transform.position = child.position;
-          correctMatches.Add(draggedObjectColor);
-          match = true;
-        }
+        draggedObject.transform.position = child.position;
+        correctMatches.Add(draggedObjectColor);
+        objectMatch = true;
       }
 
       Debug.Log(correctMatches.Count);
     }
 
-    if (match == true)
-    {
-      Debug.Log("match");
-    }
-
     draggingItem = false;
-    match = false;
+    objectMatch = false;
     draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
   }
 
@@ -149,18 +132,17 @@ public class PuzzlePieceManager : MonoBehaviour
 
     puzzleRows = existingBoard.rows;
     puzzleCols = existingBoard.cols;
+    puzzleSize = puzzleRows * puzzleCols;
     startColor = existingBoard.startColor;
     endColor = existingBoard.endColor;
   }
 
   private void GenerateColorArray()
   {
-    int tileCount = (puzzleCols * puzzleRows);
-    Color tileWidth = ((endColor - startColor)/tileCount);
-
+    Color tileWidth = ((endColor - startColor)/puzzleSize);
     colorList = new List<Color>();
 
-    for (int i = 0; i < tileCount; i++)
+    for (int i = 0; i < puzzleSize; i++)
     {
       colorList.Add(startColor + (tileWidth * i));
     }
@@ -171,39 +153,32 @@ public class PuzzlePieceManager : MonoBehaviour
     GameObject referenceTile = (GameObject)Instantiate(Resources.Load("SquareTile"));
     initialPosition = new Hashtable();
 
-      for (int i = 0; i < (puzzleCols * puzzleRows); i++)
+    for (int i = 0; i < (puzzleSize); i++)
+    {
+      GameObject tile = (GameObject)Instantiate(referenceTile, transform);
+
+      float posX = i * tileSize;
+      float posY = 5;
+      if (i >= (puzzleSize)/2)
       {
-        GameObject tile = (GameObject)Instantiate(referenceTile, transform);
-
-        float posX, posY;
-        if (i < (puzzleCols * puzzleRows)/2)
-        {
-          posX = i * tileSize;
-          posY = 5;
-        } 
-        else
-        {
-          posX = (i - (puzzleCols * puzzleRows)/2) * tileSize;
-          posY = 4;
-        }
-
-        tile.transform.position = new Vector3(posX, posY, 1f);
-
-        var tileRenderer = tile.GetComponent<Renderer>();
-
-        int end = colorList.Count;
-        int start = 0;
-        int randomIndex = Random.Range(start, end);
-        Color tileColor = colorList[randomIndex];
-        colorList.RemoveAt(randomIndex);
-        tileRenderer.material.color = tileColor;
-
-        initialPosition.Add(tileColor, tile.transform.position);
+        posX = (i - (puzzleSize)/2) * tileSize;
+        posY -= 1;
       }
+
+      tile.transform.position = new Vector3(posX, posY, 1f);
+
+      // Assign random color to tile
+      int randomIndex = Random.Range(0, colorList.Count);
+      Color tileColor = colorList[randomIndex];
+      colorList.RemoveAt(randomIndex);
+      tile.GetComponent<Renderer>().material.color = tileColor;
+
+      initialPosition.Add(tileColor, tile.transform.position);
+    }
 
     Destroy(referenceTile);
 
-    float gridWidth = ((puzzleCols * puzzleRows)/2) * tileSize;
+    float gridWidth = ((puzzleSize)/2) * tileSize;
     float gridHeight = tileSize * 2;
 
     //Changes pivot point for tiles is in the center
