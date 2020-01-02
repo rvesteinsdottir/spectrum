@@ -11,12 +11,86 @@ public class PuzzlePieceManager : MonoBehaviour
   private IList<Color> colorList;
   private float tileSize = 1f;
 
+  // Implementation for having the color snap back if incorrect location
+  private Transform[] colorLocation;
+  private Vector2[] initialPosition;
+  private Vector2 touchOffset;
+  public bool[] locked;
+  private bool draggingItem = false;
+
+  //This may need to be something other than game object
+  private GameObject draggedObject;
+
   // Start is called before the first frame update
   void Start()
   {
     GenerateVariables();
     GenerateColorArray();
     GenerateTiles();
+  }
+
+  private void Update()
+  {
+    // excluded " && !locked" here
+    if (HasInput)
+    {
+      DragOrPickUp();
+    }
+    else
+    {
+      if (draggingItem)
+        DropItem();
+    }
+  }
+
+  Vector2 CurrentTouchPosition
+  {
+    get
+    {
+      Vector2 inputPos;
+      inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+      return inputPos;
+    }
+  }
+
+  private void DragOrPickUp()
+  {
+    var inputPosition = CurrentTouchPosition;
+
+    if (draggingItem)
+    {
+      draggedObject.transform.position = inputPosition + touchOffset;
+    }
+    else
+    {
+      RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.5f);
+
+      if (touches.Length > 0)
+      {
+        var hit = touches[0];
+        if (hit.transform != null)
+        {
+          draggingItem = true;
+          draggedObject = hit.transform.gameObject;
+          touchOffset = (Vector2)hit.transform.position - inputPosition;
+          draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+        }
+      }
+    }
+  }
+
+  private bool HasInput
+  {
+    get
+    {
+      return Input.GetMouseButton(0);
+    }
+  }
+
+  void DropItem()
+  {
+    draggingItem = false;
+    draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
   }
 
   private void GenerateVariables()
@@ -47,6 +121,7 @@ public class PuzzlePieceManager : MonoBehaviour
   private void GenerateTiles()
   {
     GameObject referenceTile = (GameObject)Instantiate(Resources.Load("SquareTile"));
+    initialPosition = new Vector2[puzzleCols * puzzleRows];
 
       for (int i = 0; i < (puzzleCols * puzzleRows); i++)
       {
@@ -65,6 +140,7 @@ public class PuzzlePieceManager : MonoBehaviour
         }
 
         tile.transform.position = new Vector2(posX, posY);
+        initialPosition[i] = tile.transform.position;
 
         var tileRenderer = tile.GetComponent<Renderer>();
 
