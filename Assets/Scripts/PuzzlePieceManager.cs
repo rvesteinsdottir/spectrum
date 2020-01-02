@@ -12,16 +12,15 @@ public class PuzzlePieceManager : MonoBehaviour
   private float tileSize = 1f;
 
   // Implementation for having the color snap back if incorrect location
-  private Transform[] colorLocation;
+  private Transform[] boardTransform;
   private Vector2[] initialPosition;
+  private Vector2[] desiredTilePosition;
   private Vector2 touchOffset;
-  public bool[] locked;
+  public bool[] correct;
   private bool draggingItem = false;
-
-  //This may need to be something other than game object
   private GameObject draggedObject;
+  private Transform child;
 
-  // Start is called before the first frame update
   void Start()
   {
     GenerateVariables();
@@ -31,6 +30,16 @@ public class PuzzlePieceManager : MonoBehaviour
 
   private void Update()
   {
+    var onetime = false;
+
+    if (!onetime)
+    {
+      desiredTilePosition = new Vector2[puzzleRows * puzzleCols];
+      desiredTilePosition = PuzzleBoardManager.desiredTilePosition;
+      onetime = true;
+    }
+
+    
     // excluded " && !locked" here
     if (HasInput)
     {
@@ -53,6 +62,7 @@ public class PuzzlePieceManager : MonoBehaviour
     }
   }
 
+  // Method from  Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
   private void DragOrPickUp()
   {
     var inputPosition = CurrentTouchPosition;
@@ -72,6 +82,10 @@ public class PuzzlePieceManager : MonoBehaviour
         {
           draggingItem = true;
           draggedObject = hit.transform.gameObject;
+
+          //child = Transform.Find($"{objectColor}");
+          //Debug.Log(child.position);
+
           touchOffset = (Vector2)hit.transform.position - inputPosition;
           draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         }
@@ -89,6 +103,25 @@ public class PuzzlePieceManager : MonoBehaviour
 
   void DropItem()
   {
+
+    var draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
+
+    GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
+    Transform puzzleTransform = puzzleBoard.transform;
+    boardTransform = new Transform[puzzleRows * puzzleCols];
+
+    Debug.Log(puzzleTransform.childCount);
+    foreach (Transform child in puzzleTransform)
+    {
+      float xVectorDiff = Mathf.Abs(child.position.x - draggedObject.transform.position.x);
+      float yVectorDiff = Mathf.Abs(child.position.y - draggedObject.transform.position.y);
+      if ((child.GetComponent<Renderer>().material.color == draggedObjectColor) && xVectorDiff <= 0.5f && yVectorDiff <= 0.5f)
+      {
+        Debug.Log("match!!!!");
+      }
+    }
+
+
     draggingItem = false;
     draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
   }
@@ -96,7 +129,7 @@ public class PuzzlePieceManager : MonoBehaviour
   private void GenerateVariables()
   {
     GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
-
+    Transform puzzleTransform = puzzleBoard.transform;
     PuzzleBoardManager existingBoard = puzzleBoard.GetComponent<PuzzleBoardManager>();
 
     puzzleRows = existingBoard.rows;
@@ -127,13 +160,13 @@ public class PuzzlePieceManager : MonoBehaviour
       {
         GameObject tile = (GameObject)Instantiate(referenceTile, transform);
 
-        float posX;
-        float posY;
+        float posX, posY;
         if (i < (puzzleCols * puzzleRows)/2)
         {
           posX = i * tileSize;
           posY = 5;
-        } else
+        } 
+        else
         {
           posX = (i - (puzzleCols * puzzleRows)/2) * tileSize;
           posY = 4;
