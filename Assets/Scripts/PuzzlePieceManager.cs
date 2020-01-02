@@ -8,7 +8,7 @@ public class PuzzlePieceManager : MonoBehaviour
   private int puzzleCols;
   private Color startColor;
   private Color endColor;
-  private Color[] colorArray;
+  private IList<Color> colorList;
   private float tileSize = 1f;
 
   // Start is called before the first frame update
@@ -36,11 +36,11 @@ public class PuzzlePieceManager : MonoBehaviour
     int tileCount = (puzzleCols * puzzleRows);
     Color tileWidth = ((endColor - startColor)/tileCount);
 
-    colorArray = new Color[tileCount];
+    colorList = new List<Color>();
 
     for (int i = 0; i < tileCount; i++)
     {
-      colorArray[i] = (startColor + (tileWidth * i));
+      colorList.Add(startColor + (tileWidth * i));
     }
   }
 
@@ -68,13 +68,11 @@ public class PuzzlePieceManager : MonoBehaviour
 
         var tileRenderer = tile.GetComponent<Renderer>();
 
-        int end = colorArray.Length;
+        int end = colorList.Count;
         int start = 0;
         int randomIndex = Random.Range(start, end);
-        Color tileColor = colorArray[randomIndex];
-        //colorArray.Controls.RemoveAt(randomIndex);
-        //colorArray = colorArray.Except(new Color[]{tileColor}).ToArray();
-
+        Color tileColor = colorList[randomIndex];
+        colorList.RemoveAt(randomIndex);
         tileRenderer.material.color = tileColor;
       }
 
