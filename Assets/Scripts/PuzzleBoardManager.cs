@@ -9,7 +9,7 @@ public class PuzzleBoardManager : MonoBehaviour
   //[SerializeField]
   public int cols = 4;
   //[SerializeField]
-  private float tileSize = 0.9f;
+  public float tileSize = 0.9f;
   public Color startColor = new Color(255f/255f, 0/255f, 0/255f);
   public Color endColor = new Color(0/255f, 0/255f, 255f/255f);
   public Color[,] colorArray;

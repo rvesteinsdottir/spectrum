@@ -115,9 +115,11 @@ public class PuzzlePieceManager : MonoBehaviour
         correctMatches.Add(draggedObjectColor);
         objectMatch = true;
       }
-
-      Debug.Log(correctMatches.Count);
     }
+
+    if (objectMatch)
+      Debug.Log(correctMatches.Count);
+
 
     draggingItem = false;
     objectMatch = false;
@@ -183,6 +185,6 @@ public class PuzzlePieceManager : MonoBehaviour
 
     //Changes pivot point for tiles is in the center
     transform.position = new Vector2(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2);
-
   }
+
 }
