@@ -46,7 +46,7 @@ public class PuzzleBoardManager : MonoBehaviour
         tile.transform.Rotate(0.0f, 0.0f, 50.0f, Space.World);
 
         Color tileColor = colorArray[row, col];
-        tile.GetComponent<Renderer>().material.color = Color.gray;
+        tile.GetComponent<Renderer>().material.color = new Color (194/255f, 194/255f, 194/255f);
         tilePositions.Add(tile.transform.position, tileColor);
       }
     }
