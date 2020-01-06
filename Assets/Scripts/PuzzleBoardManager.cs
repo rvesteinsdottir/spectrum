@@ -5,9 +5,9 @@ using UnityEngine;
 public class PuzzleBoardManager : MonoBehaviour
 {
   //[SerializeField]
-  public int rows = 4;
+  public int rows;
   //[SerializeField]
-  public int cols = 4;
+  public int cols;
   //[SerializeField]
   public float tileSize = 0.9f;
   public Color startColor = new Color(255f/255f, 0/255f, 0/255f);
@@ -17,8 +17,28 @@ public class PuzzleBoardManager : MonoBehaviour
 
   void Start()
   {
+    GenerateLevel();
     GenerateColorArray();
     GenerateGrid();
+  }
+
+  private void GenerateLevel()
+  {
+    switch (PlayerPrefs.GetInt("Level"))
+    {
+      case 1:
+        rows = 2;
+        cols = 4;
+        break;
+      case 2:
+        rows = 4;
+        cols = 4;
+        break;
+      case 3:
+        rows = 4;
+        cols = 4;
+        break;
+    }
   }
 
   private void GenerateGrid()
