@@ -389,7 +389,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rows: 4
-  cols: 6
+  cols: 4
   tileSize: 0.9
   startColor: {r: 0.9056604, g: 0.055535804, b: 0.33248365, a: 1}
   endColor: {r: 0.13656995, g: 0.521027, b: 0.9339623, a: 1}
