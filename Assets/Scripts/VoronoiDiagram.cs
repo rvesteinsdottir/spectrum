@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Code adapted from Voronoi diagram tutorial in Unity3D(C#) by upgames published April 21, 2019 (https://www.youtube.com/watch?v=EDv69onIETk)
+// Code adapted from Voronoi diagram tutorial in Unity3D(C#) by Upgames published April 21, 2019 (https://www.youtube.com/watch?v=EDv69onIETk)
 
 public class VoronoiDiagram : MonoBehaviour
 {
@@ -13,7 +13,11 @@ public class VoronoiDiagram : MonoBehaviour
 
   private void Start()
   {
+    
     GetComponent<SpriteRenderer>().sprite = Sprite.Create(GetDiagram(), new Rect(0,0, imageDimensions.x, imageDimensions.y), Vector2.one * 0.5f);
+
+    var collider = GetComponent<PolygonCollider2D>();
+    Debug.Log(collider.bounds);
   }
   
   Texture2D GetDiagram()
@@ -21,10 +25,17 @@ public class VoronoiDiagram : MonoBehaviour
     Vector2Int[] centroids = new Vector2Int[regionAmount];
     Color[] regions = new Color[regionAmount];
     Color tileWidth = ((endColor - startColor)/imageDimensions.x);
+    GameObject newSprite = GameObject.Find("New Sprite");
 
     for (int i = 0; i < regionAmount; i++)
     {
       centroids[i] = new Vector2Int(Random.Range(0, imageDimensions.x), Random.Range(0, imageDimensions.y));
+
+      //add new polygon collider to the center of each voronoi graph
+      float posX = (centroids[i].x-imageDimensions.x/2)/100f;
+      float posY = (centroids[i].y-imageDimensions.y/2)/100f;
+      newSprite.AddComponent<PolygonCollider2D>().offset = new Vector2(posX, posY);
+
       regions[i] = startColor + (tileWidth * centroids[i].x);
 
     }
@@ -68,22 +79,4 @@ public class VoronoiDiagram : MonoBehaviour
 
     return tex;
   }
-
-  // public void GenerateColorArray()
-  // {
-  //   Color tileWidth = ((endColor - startColor)/(cols * rows));
-
-  //   colorArray = new Color[rows, cols];
-  //   int x = 0;
-
-  //   for (int row = 0; row < rows; row++)
-  //   {
-  //     for (int col = 0; col < cols; col++)
-  //     {
-  //       colorArray[row,col] = (startColor + (tileWidth * x));
-  //       x += 1;
-  //     }
-  //   }
-  // }
-
 }
