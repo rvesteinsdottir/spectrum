@@ -56,21 +56,102 @@ public class VoronoiDiagram : MonoBehaviour
       }
     }
 
-    Vector2Int[] voronoivertex;
-
-    for (int j = 0; j < length; j++)
+  //Vector2Int[] voronoivertex;
+    IList<int> allVerts = new List<int>();
+    
+    // Turns any pixel with more than 3 different neighbor pixels white
+    for (int j = 0; j < pixelColors.Length; j++)
     {
-        
+      int countDifs = 0;
+
+      if (j+imageDimensions.x >= pixelColors.Length)
+      {
+        countDifs += 1;
+
+      }
+      else if (pixelColors[j] != pixelColors[j+imageDimensions.x])
+      {
+          countDifs += 1;
+      } 
+
+      if(j+imageDimensions.x+1 >= pixelColors.Length)
+      {
+        countDifs += 1;
+
+      }
+      else if (pixelColors[j] != pixelColors[j+imageDimensions.x+1])
+      {
+          countDifs += 1;
+      } 
+              
+      if (j - imageDimensions.x < 0)
+      {
+        countDifs += 1;
+
+      }
+      else if(pixelColors[j] != pixelColors[j - imageDimensions.x]) 
+      {
+        countDifs += 1;
+      }
+
+      if (j - imageDimensions.x +1 < 0)
+      {
+        countDifs += 1;
+
+      }
+      else if(pixelColors[j] != pixelColors[j - imageDimensions.x +1])
+      {
+        countDifs += 1;
+      }
+
+      if (j + 1 >= pixelColors.Length)
+      {
+        countDifs += 1;
+      }
+      else if (pixelColors[j] != pixelColors[j + 1])
+      {
+        countDifs += 1;
+      }
+      if (j - 1 + imageDimensions.x >= pixelColors.Length)
+      {
+        countDifs += 1;
+      }
+      else if (pixelColors[j] != pixelColors[j - 1 + imageDimensions.x])
+      {
+        countDifs += 1;
+      }
+
+      if (j - 1 < 0)
+      {
+        countDifs += 1;
+      } 
+      else if (pixelColors[j] != pixelColors[j - 1])
+      {
+        countDifs += 1;
+      }
+
+      if (j - 1 - imageDimensions.x < 0)
+      {
+        countDifs += 1;
+      } 
+      else if (pixelColors[j] != pixelColors[j - 1 - imageDimensions.x])
+      {
+        countDifs += 1;
+      }
+
+      if (countDifs > 4)
+        allVerts.Add(j);
+      
     }
 
-    // for (int j = 0; j < imageDimensions.x; j++)
-    // {
-    //   for (int k = 0; k < imageDimensions.y; k++)
-    //   {
-    //     int index = x * imageDimensions.x + y;
-
-    //   }
-    // }
+    for (int k = 0; k < allVerts.Count; k++)
+    {
+      pixelColors[allVerts[k]] = Color.white;
+      if (allVerts[k] % imageDimensions.x == 0)
+      {
+        Debug.Log(allVerts[k]);
+      }
+    }
 
     return GetImageFromColorArray(pixelColors);
   }
