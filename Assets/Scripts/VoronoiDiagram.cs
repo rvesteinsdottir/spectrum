@@ -31,14 +31,19 @@ public class VoronoiDiagram : MonoBehaviour
     {
       centroids[i] = new Vector2Int(Random.Range(0, imageDimensions.x), Random.Range(0, imageDimensions.y));
 
-      //add new polygon collider to the center of each voronoi graph
+      //add new polygon collider to the centroid of each voronoi graph
       float posX = (centroids[i].x-imageDimensions.x/2)/100f;
       float posY = (centroids[i].y-imageDimensions.y/2)/100f;
       newSprite.AddComponent<PolygonCollider2D>().offset = new Vector2(posX, posY);
 
       regions[i] = startColor + (tileWidth * centroids[i].x);
-
     }
+
+    // add collider for testing
+    // PolygonCollider2D newCollider = newSprite.AddComponent<PolygonCollider2D>();
+    // newCollider.offset = new Vector2(0 , 0);
+    // newCollider.points = new[]{new Vector2(0,0), new Vector2(1,1), new Vector2(3,6), new Vector2(3,4)};
+    // newCollider.SetPath (0, new[]{ new Vector2(0,0), new Vector2(1,1), new Vector2(3,6), new Vector2(3,4) });
       
     Color[] pixelColors = new Color[imageDimensions.x * imageDimensions.y];
 
@@ -50,6 +55,23 @@ public class VoronoiDiagram : MonoBehaviour
         pixelColors[index] = regions[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
       }
     }
+
+    Vector2Int[] voronoivertex;
+
+    for (int j = 0; j < length; j++)
+    {
+        
+    }
+
+    // for (int j = 0; j < imageDimensions.x; j++)
+    // {
+    //   for (int k = 0; k < imageDimensions.y; k++)
+    //   {
+    //     int index = x * imageDimensions.x + y;
+
+    //   }
+    // }
+
     return GetImageFromColorArray(pixelColors);
   }
 
@@ -60,7 +82,7 @@ public class VoronoiDiagram : MonoBehaviour
 
     for (int i = 0; i < centroidVectors.Length; i++)
     {
-        if ((Vector2.Distance(pixelPos, centroidVectors[i]) < smallestDist))
+        if (Vector2.Distance(pixelPos, centroidVectors[i]) < smallestDist)
         {
           smallestDist = Vector2.Distance(pixelPos, centroidVectors[i]);
           index = i;
