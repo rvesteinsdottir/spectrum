@@ -33,10 +33,12 @@ public class TriangleManager : MonoBehaviour
     // m_goTriangle.layer = 2;
     // m_meshTriangle.RecalculateNormals ();
 
-    m_meshTriangle.vertices = new Vector3[] {new Vector3(0, 0, 0), new Vector3(0, 100, 0), new Vector3(100, 100, 100)};
-    m_meshTriangle.uv = new Vector2[] {new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1)};
+    m_meshTriangle.vertices = new Vector3[] {new Vector3(0, 0, 0), new Vector3(0, 11, 0), new Vector3(11, 11, 11)};
+    m_meshTriangle.uv = new Vector2[] {new Vector2(0, 0), new Vector2(0, 5), new Vector2(1, 1)};
     m_meshTriangle.triangles = new int[] { 0,1,2 };
-   
+    m_goTriangle.GetComponent<MeshRenderer>().material = new Material(Shader.Find("Sprites/Default")) {color = Color.red};
+    // m_goTriangle.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
+    //m_goTriangle.layer = 2;
   }
 
 
