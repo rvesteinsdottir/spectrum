@@ -4,16 +4,12 @@ using UnityEngine;
 
 public class VoronoiPieceManager : MonoBehaviour
 {
-  //private int puzzleRows;
-  //private int puzzleCols;
+
   private int puzzleSize;
   private Color startColor;
   private Color endColor;
   private Color[] pixelColors;
-  //private Color[] colorList;
-  
   private List<Color> colorList;
-  // private float tileSize = 1f;
   private Hashtable initialPosition;
   // private Dictionary<Vector3, Color> desiredTilePosition = new Dictionary<Vector3, Color>();
   private Vector2 touchOffset;
@@ -36,7 +32,7 @@ public class VoronoiPieceManager : MonoBehaviour
       Transform puzzleTransform = puzzleBoard.transform;
       VoronoiDiagram existingBoard = puzzleBoard.GetComponent<VoronoiDiagram>();
       Color[] colorArray = existingBoard.regions;
-      Debug.Log(existingBoard.regions.GetType());
+      pixelColors = existingBoard.pixelColors;
 
       colorList = new List<Color>();
       for (int index = 0; index < colorArray.Length; index++)
@@ -44,12 +40,8 @@ public class VoronoiPieceManager : MonoBehaviour
           colorList.Add(colorArray[index]);
       }
 
-      Debug.Log(colorList.Count);
       GenerateTiles();
 
-      // GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
-      // Transform puzzleTransform = puzzleBoard.transform;
-      // PuzzleBoardManager existingBoard = puzzleBoard.GetComponent<PuzzleBoardManager>();
       // desiredTilePosition = existingBoard.tilePositions;
       onetime = true;
     }
@@ -113,9 +105,26 @@ public class VoronoiPieceManager : MonoBehaviour
 
   void DropItem()
   {
-    GameObject puzzleBoard = GameObject.Find("PuzzleBoard");
+    GameObject puzzleBoard = GameObject.Find("VoronoiDiagram");
     Transform puzzleTransform = puzzleBoard.transform;
     Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
+
+    // see if dropping item on a collider
+    var inputPosition = CurrentTouchPosition;
+    Collider2D selectedCollider;
+    int PiecesLayerMask = 1 << 8;
+    RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f, PiecesLayerMask);
+
+    if (touches.Length > 0)
+    {
+      var hit = touches[0];
+      if (hit.collider != null)
+      {
+        selectedCollider = hit.collider;
+        Debug.Log(selectedCollider.bounds);
+      }
+    }
+
     bool objectMatch = false;
 
     foreach (Transform child in puzzleTransform)
@@ -129,6 +138,8 @@ public class VoronoiPieceManager : MonoBehaviour
       //   correctMatches.Add(draggedObjectColor);
       //   objectMatch = true;
       // }
+      //draggedObject.transform.position = child.position;
+
     }
 
     if (objectMatch)
@@ -137,6 +148,7 @@ public class VoronoiPieceManager : MonoBehaviour
     draggingItem = false;
     objectMatch = false;
     draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
+
   }
 
   private void GenerateVariables()
@@ -145,13 +157,10 @@ public class VoronoiPieceManager : MonoBehaviour
     Transform puzzleTransform = puzzleBoard.transform;
     VoronoiDiagram existingBoard = puzzleBoard.GetComponent<VoronoiDiagram>();
 
-    //puzzleRows = existingBoard.rows;
-    //puzzleCols = existingBoard.cols;
     puzzleSize = existingBoard.regionAmount;
     startColor = existingBoard.startColor;
     endColor = existingBoard.endColor;
     pixelColors = existingBoard.pixelColors;
-    
   }
 
   private void GenerateTiles()
@@ -164,11 +173,11 @@ public class VoronoiPieceManager : MonoBehaviour
     {
       GameObject tile = (GameObject)Instantiate(referenceTile, transform);
 
-      float posX = i * tileSize;
+      float posX = i * tileSize + 0.5f;
       float posY = 5;
       if (i >= puzzleSize/2)
       {
-        posX = (i - puzzleSize/2) * tileSize;
+        posX = (i - puzzleSize/2) * tileSize + 0.5f;
         posY -= 1;
       }
 
