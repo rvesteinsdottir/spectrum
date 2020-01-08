@@ -98,15 +98,11 @@ public class VoronoiDiagram : MonoBehaviour
     }
 
     GameObject currentSprite = GameObject.Find("New Sprite");
-    int vertCount = 0;
 
 
     for (int x = 0; x < colliders.Length; x++)
     {
-      PolygonCollider2D newCollider = currentSprite.AddComponent<PolygonCollider2D>();
-      float posX = (colliders[x][0].x-imageDimensions.x/2)/100f;
-      float posY = (colliders[x][0].y-imageDimensions.y/2)/100f;
-      newCollider.offset = new Vector2(posX, posY);
+
       Debug.Log($"collider: {colliders[x][0]}");
       Vector2 center = colliders[x][0];
       colliders[x].RemoveAt(0);
@@ -114,21 +110,27 @@ public class VoronoiDiagram : MonoBehaviour
       
       collidersList.Sort((v, w) => compare(v, w, center));
 
-      for (int n = 0; n < collidersList.Count; n++)
-      {
-        Debug.Log(collidersList[n]);
-      }
-
       Vector2[] pointsArray = new Vector2[collidersList.Count];
-      for (int z = 1; z < collidersList.Count; z++)
+      for (int z = 0; z < collidersList.Count; z++)
       {
-        float positionX = (collidersList[z].x-imageDimensions.x/2)/100f;
-        float positionY =  (collidersList[z].y-imageDimensions.y/2)/100f;
-        pointsArray[z-1] = new Vector2(positionX, positionY);
+        float positionY = (collidersList[z].x-imageDimensions.x/2)/100f;
+        float positionX = (collidersList[z].y-imageDimensions.y/2)/100f;
+        pointsArray[z] = new Vector2(positionX, positionY);
       }
 
+      Debug.Log($"collider: {center}");
+      for (int n = 0; n < pointsArray.Length; n++)
+      {
+          Debug.Log(pointsArray[n]);
+      }
+
+      PolygonCollider2D newCollider = currentSprite.AddComponent<PolygonCollider2D>();
+      // float posX = (colliders[x][0].x-imageDimensions.x/2)/100f;
+      // float posY = (colliders[x][0].y-imageDimensions.y/2)/100f;
+      // newCollider.offset = new Vector2(posX, posY);
+      //newCollider.offset = new Vector2(0, 0, 90);
       newCollider.points = pointsArray;
-      newCollider.SetPath (0, pointsArray);
+      newCollider.SetPath(0, pointsArray);
     }
   }
 
