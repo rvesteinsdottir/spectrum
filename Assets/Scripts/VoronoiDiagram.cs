@@ -16,6 +16,7 @@ public class VoronoiDiagram : MonoBehaviour
   {
     
     GetComponent<SpriteRenderer>().sprite = Sprite.Create(GetDiagram(), new Rect(0,0, imageDimensions.x, imageDimensions.y), Vector2.one * 0.5f);
+    transform.position = new Vector3(0, -2, 0);
 
     var collider = GetComponent<PolygonCollider2D>();
   }
@@ -27,29 +28,15 @@ public class VoronoiDiagram : MonoBehaviour
     Color tileWidth = ((endColor - startColor)/imageDimensions.x);
     GameObject newSprite = GameObject.Find("New Sprite");
     List<Vector2>[] colliders = new List<Vector2>[regionAmount];
-    //Dictionary<Vector2Int, IList> colliders = new Dictionary<Vector2Int, IList>();
     
     for (int i = 0; i < regionAmount; i++)
     {
       centroids[i] = new Vector2Int(Random.Range(0, imageDimensions.x), Random.Range(0, imageDimensions.y));
 
-      //add new polygon collider to the centroid of each voronoi graph
-      //float posX = (centroids[i].x-imageDimensions.x/2)/100f;
-      //float posY = (centroids[i].y-imageDimensions.y/2)/100f;
-      //newSprite.AddComponent<PolygonCollider2D>().offset = new Vector2(posX, posY);
       colliders[i] = new List<Vector2>(){ centroids[i] };
-      //IList<Vector2Int> associatedVerts = new List<Vector2Int>();
-
-      //colliders.Add(centroids[i], associatedVerts);
 
       regions[i] = startColor + (tileWidth * centroids[i].x);
     }
-
-    // add collider for testing
-    // PolygonCollider2D newCollider = newSprite.AddComponent<PolygonCollider2D>();
-    // newCollider.offset = new Vector2(0 , 0);
-    // newCollider.points = new[]{new Vector2(0,0), new Vector2(1,1), new Vector2(3,6), new Vector2(3,4)};
-    // newCollider.SetPath (0, new[]{ new Vector2(0,0), new Vector2(1,1), new Vector2(3,6), new Vector2(3,4) });
       
     Color[] pixelColors = new Color[imageDimensions.x * imageDimensions.y];
 
@@ -71,7 +58,6 @@ public class VoronoiDiagram : MonoBehaviour
 
   private void assignColliders(IList<Vector2Int> vertices, List<Vector2>[] colliders)
   {
-    Debug.Log($"Total vertices {vertices.Count}");
     for (int i = 0; i < vertices.Count; i++)
     {
       float smallestDist = float.MaxValue;
@@ -89,21 +75,13 @@ public class VoronoiDiagram : MonoBehaviour
       }
 
       colliders[colliderIndex].Add(vertices[i]);
-      //Debug.Log($"vertex index{i}: {vertices[i]}, collider: {colliders[colliderIndex][0]}, length of collider (includes col) {colliders[colliderIndex].Count}");
-    }
-
-    for (int r = 0; r < colliders.Length; r++)
-    {
-        Debug.Log($"collider {colliders[r][0]} collider length {colliders[r].Count}");
     }
 
     GameObject currentSprite = GameObject.Find("New Sprite");
 
-
     for (int x = 0; x < colliders.Length; x++)
     {
 
-      Debug.Log($"collider: {colliders[x][0]}");
       Vector2 center = colliders[x][0];
       colliders[x].RemoveAt(0);
       List<Vector2> collidersList = colliders[x].ToList();
@@ -118,17 +96,7 @@ public class VoronoiDiagram : MonoBehaviour
         pointsArray[z] = new Vector2(positionX, positionY);
       }
 
-      Debug.Log($"collider: {center}");
-      for (int n = 0; n < pointsArray.Length; n++)
-      {
-          Debug.Log(pointsArray[n]);
-      }
-
       PolygonCollider2D newCollider = currentSprite.AddComponent<PolygonCollider2D>();
-      // float posX = (colliders[x][0].x-imageDimensions.x/2)/100f;
-      // float posY = (colliders[x][0].y-imageDimensions.y/2)/100f;
-      // newCollider.offset = new Vector2(posX, posY);
-      //newCollider.offset = new Vector2(0, 0, 90);
       newCollider.points = pointsArray;
       newCollider.SetPath(0, pointsArray);
     }
@@ -288,10 +256,10 @@ public class VoronoiDiagram : MonoBehaviour
       }
     }
 
-    for (int k = 0; k < allVerts.Count; k++)
-    {
-      pixelColors[allVerts[k]] = Color.white;
-    }
+    // for (int k = 0; k < allVerts.Count; k++)
+    // {
+    //   pixelColors[allVerts[k]] = Color.white;
+    // }
 
     return vertices;
   }
