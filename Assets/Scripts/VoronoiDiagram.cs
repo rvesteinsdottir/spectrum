@@ -11,6 +11,8 @@ public class VoronoiDiagram : MonoBehaviour
   public int regionAmount;
   public Color startColor = new Color(255f/255f, 0/255f, 0/255f);
   public Color endColor = new Color(0/255f, 0/255f, 255f/255f);
+  public Color[] pixelColors;
+  public Color[] regions;
 
   private void Start()
   {
@@ -24,9 +26,9 @@ public class VoronoiDiagram : MonoBehaviour
   Texture2D GetDiagram()
   {
     Vector2Int[] centroids = new Vector2Int[regionAmount];
-    Color[] regions = new Color[regionAmount];
+    regions = new Color[regionAmount];
     Color tileWidth = ((endColor - startColor)/imageDimensions.x);
-    GameObject newSprite = GameObject.Find("New Sprite");
+    GameObject newSprite = GameObject.Find("VoronoiDiagram");
     List<Vector2>[] colliders = new List<Vector2>[regionAmount];
     
     for (int i = 0; i < regionAmount; i++)
@@ -38,7 +40,7 @@ public class VoronoiDiagram : MonoBehaviour
       regions[i] = startColor + (tileWidth * centroids[i].x);
     }
       
-    Color[] pixelColors = new Color[imageDimensions.x * imageDimensions.y];
+    pixelColors = new Color[imageDimensions.x * imageDimensions.y];
 
     for (int x = 0; x < imageDimensions.x; x++)
     {
@@ -77,7 +79,7 @@ public class VoronoiDiagram : MonoBehaviour
       colliders[colliderIndex].Add(vertices[i]);
     }
 
-    GameObject currentSprite = GameObject.Find("New Sprite");
+    GameObject currentSprite = GameObject.Find("VoronoiDiagram");
 
     for (int x = 0; x < colliders.Length; x++)
     {
@@ -102,6 +104,8 @@ public class VoronoiDiagram : MonoBehaviour
     }
   }
 
+
+  // Method adapted from Stack OverFlow answer from ciamej on August 8, 2011 (https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order)
   int compare (Vector2 a, Vector2 b, Vector2 center)
   {
     if (a.x - center.x >= 0 && b.x - center.x < 0)
