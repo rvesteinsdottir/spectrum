@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -70,7 +71,7 @@ public class VoronoiDiagram : MonoBehaviour
 
   private void assignColliders(IList<Vector2Int> vertices, List<Vector2>[] colliders)
   {
-    //Debug.Log($"Total vertices {vertices.Count}");
+    Debug.Log($"Total vertices {vertices.Count}");
     for (int i = 0; i < vertices.Count; i++)
     {
       float smallestDist = float.MaxValue;
@@ -88,10 +89,17 @@ public class VoronoiDiagram : MonoBehaviour
       }
 
       colliders[colliderIndex].Add(vertices[i]);
-      //Debug.Log($"vertex index{i}: {vertices[i]}, collider: {colliders[colliderIndex][0]}");
+      //Debug.Log($"vertex index{i}: {vertices[i]}, collider: {colliders[colliderIndex][0]}, length of collider (includes col) {colliders[colliderIndex].Count}");
+    }
+
+    for (int r = 0; r < colliders.Length; r++)
+    {
+        Debug.Log($"collider {colliders[r][0]} collider length {colliders[r].Count}");
     }
 
     GameObject currentSprite = GameObject.Find("New Sprite");
+    int vertCount = 0;
+
 
     for (int x = 0; x < colliders.Length; x++)
     {
@@ -99,22 +107,64 @@ public class VoronoiDiagram : MonoBehaviour
       float posX = (colliders[x][0].x-imageDimensions.x/2)/100f;
       float posY = (colliders[x][0].y-imageDimensions.y/2)/100f;
       newCollider.offset = new Vector2(posX, posY);
+      Debug.Log($"collider: {colliders[x][0]}");
+      Vector2 center = colliders[x][0];
+      colliders[x].RemoveAt(0);
+      List<Vector2> collidersList = colliders[x].ToList();
+      
+      collidersList.Sort((v, w) => compare(v, w, center));
 
-      int length = colliders[x].Count - 1;
-      Vector2[] pointsArray = new Vector2[length];
-      for (int z = 1; z < length; z++)
+      for (int n = 0; n < collidersList.Count; n++)
       {
-        float positionX = colliders[x][z].x;
-        float positionY =  colliders[x][z].y;
+        Debug.Log(collidersList[n]);
+      }
+
+      Vector2[] pointsArray = new Vector2[collidersList.Count];
+      for (int z = 1; z < collidersList.Count; z++)
+      {
+        float positionX = (collidersList[z].x-imageDimensions.x/2)/100f;
+        float positionY =  (collidersList[z].y-imageDimensions.y/2)/100f;
         pointsArray[z-1] = new Vector2(positionX, positionY);
       }
 
-      Debug.Log(pointsArray.GetType());
-      // newCollider.points = new[]{ pointsArray };
-      // newCollider.SetPath (0, new[]{ pointsArray });
-
+      newCollider.points = pointsArray;
+      newCollider.SetPath (0, pointsArray);
     }
   }
+
+  int compare (Vector2 a, Vector2 b, Vector2 center)
+  {
+    if (a.x - center.x >= 0 && b.x - center.x < 0)
+        //return true;
+        return 1;
+    if (a.x - center.x < 0 && b.x - center.x >= 0)
+        //return false;
+        return -1;
+    if (a.x - center.x == 0 && b.x - center.x == 0) {
+        if (a.y - center.y >= 0 || b.y - center.y >= 0)
+            //return a.y > b.y;
+            return a.y > b.y ? 1 : -1;
+        //return b.y > a.y;
+        return b.y > a.y ? 1 : -1;
+    }
+
+    // compute the cross product of vectors (center -> a) x (center -> b)
+    float det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
+    if (det < 0)
+        //return true;
+        return 1;
+    if (det > 0)
+        //return false;
+        return -1;
+
+    // points a and b are on the same line from the center
+    // check which point is closer to the center
+    float d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
+    float d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
+    //return d1 > d2;
+    return d1 > d2 ? 1 : -1;
+  }
+
 
   int GetClosestCentroidIndex(Vector2Int pixelPos, Vector2Int[] centroidVectors)
   {
@@ -228,7 +278,7 @@ public class VoronoiDiagram : MonoBehaviour
           countDifs += 1;
         }
 
-        if (countDifs > 4)
+        if (countDifs > 3)
         {
           allVerts.Add(j);
           vertices.Add(new Vector2Int(row, col));

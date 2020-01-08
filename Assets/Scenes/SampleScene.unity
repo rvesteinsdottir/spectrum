@@ -749,8 +749,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   imageDimensions: {x: 600, y: 600}
   regionAmount: 10
-  startColor: {r: 0.8867924, g: 0.7157835, b: 0.4224813, a: 1}
-  endColor: {r: 0.11367659, g: 0.5, b: 0.08254716, a: 1}
+  startColor: {r: 0.8773585, g: 0.12829298, b: 0.18294686, a: 1}
+  endColor: {r: 0.08085619, g: 0.29429188, b: 0.745283, a: 1}
 --- !u!212 &1409904618
 SpriteRenderer:
   m_ObjectHideFlags: 0
