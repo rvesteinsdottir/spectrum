@@ -14,6 +14,7 @@ public class VoronoiDiagram : MonoBehaviour
   public Color[] pixelColors;
   public Color[] regions;
   public PolygonCollider2D[] allColliders;
+  public bool updateNeeded = false;
 
 
   private void Start()
@@ -23,8 +24,23 @@ public class VoronoiDiagram : MonoBehaviour
     transform.position = new Vector3(0, -2, 0);
 
     var collider = GetComponent<PolygonCollider2D>();
+  } 
+
+
+  private void Update()
+  {
+    if (updateNeeded)
+    {
+      updateDisplay();
+      updateNeeded = false;
+    }
   }
- 
+
+  // re-render based on box that was moved
+  private void updateDisplay()
+  {
+
+  }
   
   Texture2D GetDiagram()
   {

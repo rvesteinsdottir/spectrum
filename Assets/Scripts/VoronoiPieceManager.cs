@@ -113,6 +113,7 @@ public class VoronoiPieceManager : MonoBehaviour
     Transform puzzleTransform = puzzleBoard.transform;
     Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
 
+
     // see if dropping item on a collider
     var inputPosition = CurrentTouchPosition;
     Collider2D selectedCollider;
@@ -132,36 +133,13 @@ public class VoronoiPieceManager : MonoBehaviour
         if (colliderIndex == boxIndex)
         {
           correctMatches.Add(draggedObjectColor);
-
-          Debug.Log($"Match #{correctMatches.Count}");
+          puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
         }
       }
     }
 
-    bool objectMatch = false;
-
-    foreach (Transform child in puzzleTransform)
-    {
-      float xDiff = Mathf.Abs(child.position.x - draggedObject.transform.position.x);
-      float yDiff = Mathf.Abs(child.position.y - draggedObject.transform.position.y);
-
-      // if ((desiredTilePosition[child.position] == draggedObjectColor) && xDiff <= 0.5f && yDiff <= 0.5f && !correctMatches.Contains(draggedObjectColor))
-      // {
-      //   draggedObject.transform.position = child.position;
-      //   correctMatches.Add(draggedObjectColor);
-      //   objectMatch = true;
-      // }
-      //draggedObject.transform.position = child.position;
-
-    }
-
-    if (objectMatch)
-      Debug.Log(correctMatches.Count);
-
     draggingItem = false;
-    objectMatch = false;
     draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
-
   }
 
   private void GenerateVariables()
