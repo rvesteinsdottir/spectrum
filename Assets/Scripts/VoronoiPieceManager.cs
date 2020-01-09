@@ -31,7 +31,7 @@ public class VoronoiPieceManager : MonoBehaviour
     if (!onetime)
     {
       VoronoiDiagram existingBoard = GameObject.Find("VoronoiDiagram").GetComponent<VoronoiDiagram>();
-      colorArray = existingBoard.regions;
+      colorArray = existingBoard.regionColor;
       pixelColors = existingBoard.pixelColors;
       allColliders = existingBoard.allColliders;
 
@@ -131,6 +131,7 @@ public class VoronoiPieceManager : MonoBehaviour
         if (colliderIndex == boxIndex)
         {
           correctMatches.Add(draggedObjectColor);
+          Destroy(draggedObject);
           Debug.Log(selectedCollider.bounds);
           puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
           puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
@@ -189,6 +190,6 @@ public class VoronoiPieceManager : MonoBehaviour
     float gridHeight = tileSize * 2;
 
     //Changes pivot point for tiles is in the center
-    transform.position = new Vector2(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2);
+    transform.position = new Vector3(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2, 1);
   }
 }

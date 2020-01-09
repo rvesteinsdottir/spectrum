@@ -13,12 +13,12 @@ public class VoronoiDiagram : MonoBehaviour
   public Color endColor = new Color(0/255f, 0/255f, 255f/255f);
   public Color[] pixelColors;
   public Color[] regions;
+  public Color[] regionColor;
   public PolygonCollider2D[] allColliders;
   public bool updateNeeded = false;
   public int updateIndex;
   private Vector2Int[] centroids;
   private List<Vector2>[] colliders;
-
 
   private void Start()
   {
@@ -47,10 +47,13 @@ public class VoronoiDiagram : MonoBehaviour
   Texture2D UpdateDiagram(int i)
   {
     Debug.Log("updating");
-    regions[i] = Color.white;
+
+    // Set region to appropriate color
+    regions[i] = regionColor[i];
 
     pixelColors = new Color[imageDimensions.x * imageDimensions.y];
 
+    // Renders image
     for (int x = 0; x < imageDimensions.x; x++)
     {
       for (int y = 0; y < imageDimensions.y; y++)
@@ -71,6 +74,7 @@ public class VoronoiDiagram : MonoBehaviour
   {
     centroids = new Vector2Int[regionAmount];
     regions = new Color[regionAmount];
+    regionColor = new Color[regionAmount];
     Color tileWidth = ((endColor - startColor)/imageDimensions.x);
     GameObject newSprite = GameObject.Find("VoronoiDiagram");
     colliders = new List<Vector2>[regionAmount];
@@ -78,13 +82,15 @@ public class VoronoiDiagram : MonoBehaviour
     for (int i = 0; i < regionAmount; i++)
     {
       centroids[i] = new Vector2Int(Random.Range(0, imageDimensions.x), Random.Range(0, imageDimensions.y));
-
       colliders[i] = new List<Vector2>(){ centroids[i] };
 
-      regions[i] = startColor + (tileWidth * centroids[i].x);
+      regionColor[i] = startColor + (tileWidth * centroids[i].x);
+      regions[i] = Color.white;
     }
-      
+
     pixelColors = new Color[imageDimensions.x * imageDimensions.y];
+    Color[] expectedPixelColors = new Color[imageDimensions.x * imageDimensions.y];
+    
 
     for (int x = 0; x < imageDimensions.x; x++)
     {
@@ -92,11 +98,17 @@ public class VoronoiDiagram : MonoBehaviour
       {
         int index = x * imageDimensions.x + y;
         pixelColors[index] = regions[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
+        expectedPixelColors[index] = regionColor[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
       }
     }
+    
+    IList<Vector2Int> vertices = findVerts(expectedPixelColors);
 
-    IList<Vector2Int> vertices = new List<Vector2Int>();
-    vertices = findVerts(pixelColors);
+    for (int w = 0; w < vertices.Count; w++)
+    {
+      int index = vertices[w].x * imageDimensions.x + vertices[w].y;
+      pixelColors[index] = Color.red;
+    }
     assignColliders(vertices, colliders);
 
     return GetImageFromColorArray(pixelColors);
@@ -133,7 +145,8 @@ public class VoronoiDiagram : MonoBehaviour
       colliders[x].RemoveAt(0);
       List<Vector2> collidersList = colliders[x].ToList();
       
-      //collidersList.Sort((v, w) => compare(v, w, center));
+      // Is this sorting necessary?
+      collidersList.Sort((v, w) => compare(v, w, center));
 
       Vector2[] pointsArray = new Vector2[collidersList.Count];
       for (int z = 0; z < collidersList.Count; z++)
@@ -309,7 +322,7 @@ public class VoronoiDiagram : MonoBehaviour
 
     for (int k = 0; k < allVerts.Count; k++)
     {
-      pixelColors[allVerts[k]] = Color.gray;
+      pixelColors[allVerts[k]] = Color.red;
     }
 
     return vertices;
