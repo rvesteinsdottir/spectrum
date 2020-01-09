@@ -409,7 +409,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 720737548}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
   m_LocalScale: {x: 6, y: 20, z: 10}
   m_Children: []
   m_Father: {fileID: 0}
@@ -707,9 +707,12 @@ MonoBehaviour:
   imageDimensions: {x: 600, y: 600}
   regionAmount: 10
   startColor: {r: 0.8773585, g: 0.12829298, b: 0.18294686, a: 1}
-  endColor: {r: 0.08085619, g: 0.29429188, b: 0.745283, a: 1}
+  endColor: {r: 0.08235295, g: 0.74509805, b: 0.73250556, a: 1}
   pixelColors: []
   regions: []
+  allColliders: []
+  updateNeeded: 0
+  updateIndex: 0
 --- !u!212 &1409904618
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -953,7 +956,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2037388571}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

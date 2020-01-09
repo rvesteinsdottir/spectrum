@@ -30,9 +30,7 @@ public class VoronoiPieceManager : MonoBehaviour
     // Store Dictionary of desired tile position
     if (!onetime)
     {
-      GameObject puzzleBoard = GameObject.Find("VoronoiDiagram");
-      Transform puzzleTransform = puzzleBoard.transform;
-      VoronoiDiagram existingBoard = puzzleBoard.GetComponent<VoronoiDiagram>();
+      VoronoiDiagram existingBoard = GameObject.Find("VoronoiDiagram").GetComponent<VoronoiDiagram>();
       colorArray = existingBoard.regions;
       pixelColors = existingBoard.pixelColors;
       allColliders = existingBoard.allColliders;
@@ -40,13 +38,10 @@ public class VoronoiPieceManager : MonoBehaviour
       colorList = new List<Color>();
       for (int index = 0; index < colorArray.Length; index++)
       {
-          colorList.Add(colorArray[index]);
+        colorList.Add(colorArray[index]);
       }
 
-
       GenerateTiles();
-
-      // desiredTilePosition = existingBoard.tilePositions;
       onetime = true;
     }
 
@@ -82,7 +77,9 @@ public class VoronoiPieceManager : MonoBehaviour
     }
     else
     {
-      RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f);
+      int BoardLayerMask =~ LayerMask.GetMask("Board");
+
+      RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f, BoardLayerMask);
 
       if (touches.Length > 0)
       {
@@ -91,8 +88,9 @@ public class VoronoiPieceManager : MonoBehaviour
         {
           draggingItem = true;
           draggedObject = hit.transform.gameObject;
-
           touchOffset = (Vector2)hit.transform.position - inputPosition;
+
+          // Increase object size when being dragged
           draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         }
       }
@@ -133,6 +131,8 @@ public class VoronoiPieceManager : MonoBehaviour
         if (colliderIndex == boxIndex)
         {
           correctMatches.Add(draggedObjectColor);
+          Debug.Log(selectedCollider.bounds);
+          puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
           puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
         }
       }

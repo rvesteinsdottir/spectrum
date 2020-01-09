@@ -15,6 +15,9 @@ public class VoronoiDiagram : MonoBehaviour
   public Color[] regions;
   public PolygonCollider2D[] allColliders;
   public bool updateNeeded = false;
+  public int updateIndex;
+  private Vector2Int[] centroids;
+  private List<Vector2>[] colliders;
 
 
   private void Start()
@@ -31,24 +34,46 @@ public class VoronoiDiagram : MonoBehaviour
   {
     if (updateNeeded)
     {
-      updateDisplay();
+      Debug.Log("update started");
+      //Destroy(GetComponent<SpriteRenderer>());
+      GetComponent<SpriteRenderer>().sprite = Sprite.Create(UpdateDiagram(updateIndex), new Rect(0,0, imageDimensions.x, imageDimensions.y), Vector2.one * 0.5f);
+      transform.position = new Vector3(0, -2, 0);
+
       updateNeeded = false;
     }
   }
 
   // re-render based on box that was moved
-  private void updateDisplay()
+  Texture2D UpdateDiagram(int i)
   {
+    Debug.Log("updating");
+    regions[i] = Color.white;
 
+    pixelColors = new Color[imageDimensions.x * imageDimensions.y];
+
+    for (int x = 0; x < imageDimensions.x; x++)
+    {
+      for (int y = 0; y < imageDimensions.y; y++)
+      {
+        int index = x * imageDimensions.x + y;
+        pixelColors[index] = regions[GetClosestCentroidIndex(new Vector2Int(x, y), centroids)];
+      }
+    }
+
+    IList<Vector2Int> vertices = new List<Vector2Int>();
+    vertices = findVerts(pixelColors);
+    assignColliders(vertices, colliders);
+
+    return GetImageFromColorArray(pixelColors);
   }
   
   Texture2D GetDiagram()
   {
-    Vector2Int[] centroids = new Vector2Int[regionAmount];
+    centroids = new Vector2Int[regionAmount];
     regions = new Color[regionAmount];
     Color tileWidth = ((endColor - startColor)/imageDimensions.x);
     GameObject newSprite = GameObject.Find("VoronoiDiagram");
-    List<Vector2>[] colliders = new List<Vector2>[regionAmount];
+    colliders = new List<Vector2>[regionAmount];
     
     for (int i = 0; i < regionAmount; i++)
     {
@@ -108,7 +133,7 @@ public class VoronoiDiagram : MonoBehaviour
       colliders[x].RemoveAt(0);
       List<Vector2> collidersList = colliders[x].ToList();
       
-      collidersList.Sort((v, w) => compare(v, w, center));
+      //collidersList.Sort((v, w) => compare(v, w, center));
 
       Vector2[] pointsArray = new Vector2[collidersList.Count];
       for (int z = 0; z < collidersList.Count; z++)
@@ -282,10 +307,10 @@ public class VoronoiDiagram : MonoBehaviour
       }
     }
 
-    // for (int k = 0; k < allVerts.Count; k++)
-    // {
-    //   pixelColors[allVerts[k]] = Color.white;
-    // }
+    for (int k = 0; k < allVerts.Count; k++)
+    {
+      pixelColors[allVerts[k]] = Color.gray;
+    }
 
     return vertices;
   }
