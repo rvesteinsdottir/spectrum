@@ -10,6 +10,7 @@ public class VoronoiPieceManager : MonoBehaviour
   private Color endColor;
   private Color[] pixelColors;
   private List<Color> colorList;
+  private Color[] colorArray;
   private Hashtable initialPosition;
   // private Dictionary<Vector3, Color> desiredTilePosition = new Dictionary<Vector3, Color>();
   private Vector2 touchOffset;
@@ -17,6 +18,7 @@ public class VoronoiPieceManager : MonoBehaviour
   private GameObject draggedObject;
   public IList<Color> correctMatches = new List<Color>();
   private bool onetime = false;
+  private PolygonCollider2D[] allColliders;
 
   void Start()
   {
@@ -31,14 +33,16 @@ public class VoronoiPieceManager : MonoBehaviour
       GameObject puzzleBoard = GameObject.Find("VoronoiDiagram");
       Transform puzzleTransform = puzzleBoard.transform;
       VoronoiDiagram existingBoard = puzzleBoard.GetComponent<VoronoiDiagram>();
-      Color[] colorArray = existingBoard.regions;
+      colorArray = existingBoard.regions;
       pixelColors = existingBoard.pixelColors;
+      allColliders = existingBoard.allColliders;
 
       colorList = new List<Color>();
       for (int index = 0; index < colorArray.Length; index++)
       {
           colorList.Add(colorArray[index]);
       }
+
 
       GenerateTiles();
 
@@ -121,7 +125,16 @@ public class VoronoiPieceManager : MonoBehaviour
       if (hit.collider != null)
       {
         selectedCollider = hit.collider;
-        Debug.Log(selectedCollider.bounds);
+        int colliderIndex = System.Array.IndexOf(allColliders, selectedCollider);
+        int boxIndex = System.Array.IndexOf(colorArray, draggedObjectColor);
+
+        // Determines if box landed on correct region
+        if (colliderIndex == boxIndex)
+        {
+          correctMatches.Add(draggedObjectColor);
+
+          Debug.Log($"Match #{correctMatches.Count}");
+        }
       }
     }
 

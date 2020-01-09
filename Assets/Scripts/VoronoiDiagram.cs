@@ -13,6 +13,7 @@ public class VoronoiDiagram : MonoBehaviour
   public Color endColor = new Color(0/255f, 0/255f, 255f/255f);
   public Color[] pixelColors;
   public Color[] regions;
+  public PolygonCollider2D[] allColliders;
 
 
   private void Start()
@@ -23,7 +24,6 @@ public class VoronoiDiagram : MonoBehaviour
 
     var collider = GetComponent<PolygonCollider2D>();
   }
-
  
   
   Texture2D GetDiagram()
@@ -83,6 +83,7 @@ public class VoronoiDiagram : MonoBehaviour
     }
 
     GameObject currentSprite = GameObject.Find("VoronoiDiagram");
+    allColliders = new PolygonCollider2D[regionAmount];
 
     for (int x = 0; x < colliders.Length; x++)
     {
@@ -105,8 +106,7 @@ public class VoronoiDiagram : MonoBehaviour
       newCollider.points = pointsArray;
       newCollider.SetPath(0, pointsArray);
       newCollider.isTrigger = true;
-      // newCollider.tag = (x).ToString();;
-      //newCollider.pathCount = 0;
+      allColliders[x] = newCollider;
     }
   }
 
@@ -171,11 +171,6 @@ public class VoronoiDiagram : MonoBehaviour
     tex.Apply();
 
     return tex;
-  }
-
-  void onTriggerEnter(Collider col)
-  {
-    Debug.Log($"Object triggered{col}");
   }
 
   IList<Vector2Int> findVerts(Color[] pixelColors)
