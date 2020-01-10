@@ -9,8 +9,8 @@ using csDelaunay;
 public class TestMesh : MonoBehaviour
 {
     private int polygonNumber = 10;
-    public Color startColor;
-    public Color endColor;
+    private Color startColor = Color.red;
+    private Color endColor = Color.blue;
  
     // This is where we will store the resulting data
     private Dictionary<Vector2f, Site> sites;
@@ -45,6 +45,8 @@ public class TestMesh : MonoBehaviour
 
     private void DisplayVoronoiDiagram() {
         Debug.Log(sites.Count);
+        Color tileWidth = ((endColor - startColor)/polygonNumber);
+        int index = 0;
 
         foreach(KeyValuePair<Vector2f, Site> entry in sites)
         {
@@ -101,17 +103,14 @@ public class TestMesh : MonoBehaviour
             go.AddComponent<MeshFilter>();
             go.AddComponent<MeshRenderer>();
 
-            Mesh msh = go.GetComponent<MeshFilter>().mesh;
+            Mesh mesh = go.GetComponent<MeshFilter>().mesh;
 
-            msh.Clear();
-            msh.vertices = vertices3D;
-            msh.triangles = indices;
-            msh.RecalculateNormals();
-            msh.RecalculateBounds();
-            msh.uv = uniqueVerticesArray;
-            //go.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.white);
-            // Destroy(go.GetComponent<MeshRenderer>().material);
-
+            mesh.Clear();
+            mesh.vertices = vertices3D;
+            mesh.triangles = indices;
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            mesh.uv = uniqueVerticesArray;
 
             Texture2D texture = new Texture2D(128, 128);
 
@@ -119,7 +118,7 @@ public class TestMesh : MonoBehaviour
             {
                 for (int x = 0; x < texture.width; x++)
                 {
-                    Color color = Color.blue;
+                    Color color = (startColor + (tileWidth * index));
                     texture.SetPixel(x, y, color);
                 }
             }
@@ -130,7 +129,7 @@ public class TestMesh : MonoBehaviour
             mat.mainTexture = texture;
 
             go.GetComponent<MeshRenderer>().material = mat; 
-
+            index += 1;
         }
     }
 
