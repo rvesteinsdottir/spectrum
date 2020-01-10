@@ -47,6 +47,12 @@ public class TestMesh : MonoBehaviour
         Debug.Log(sites.Count);
         Color tileWidth = ((endColor - startColor)/polygonNumber);
         int index = 0;
+       
+        float highX = ((imageDim.x/2)/100f);
+        float highY = ((imageDim.y/2)/100f);
+        float lowX = -highX;
+        float lowY = -highY;
+        
 
         foreach(KeyValuePair<Vector2f, Site> entry in sites)
         {
@@ -54,7 +60,10 @@ public class TestMesh : MonoBehaviour
             float sitePosX = ((newSite.x - imageDim.x/2)/100f);
             float sitePosY = ((newSite.y - imageDim.x/2)/100f);
             Vector2 center = new Vector2(sitePosX, sitePosY);
-
+            bool containsLowX = false;
+            bool containsLowY = false;
+            bool containsHighX = false;
+            bool containsHighY = false;
 
             List<Edge> siteEdges = newSite.Edges;
             List<Vector2> vertices2D = new List<Vector2>();
@@ -65,17 +74,54 @@ public class TestMesh : MonoBehaviour
             for (int i = 0; i < siteEdges.Count; i++)
             {
                 if (siteEdges[i].ClippedEnds == null) continue;
+
                 float posX = siteEdges[i].ClippedEnds[LR.LEFT].x; 
                 float posY = siteEdges[i].ClippedEnds[LR.LEFT].y;
 
                 Vector2 adjustedLeft = new Vector2(((posX-imageDim.x/2)/100f), (posY-imageDim.y/2)/100f);
                 vertices2D.Add(new Vector2(adjustedLeft.x, adjustedLeft.y));
 
-                posX = siteEdges[i].ClippedEnds[LR.RIGHT].x; 
-                posY = siteEdges[i].ClippedEnds[LR.RIGHT].y;
+                float nextPosX = siteEdges[i].ClippedEnds[LR.RIGHT].x; 
+                float nextPosY = siteEdges[i].ClippedEnds[LR.RIGHT].y;
 
-                Vector2 adjustedRight = new Vector2(((posX-imageDim.x/2)/100f), (posY-imageDim.y/2)/100f);
+                Vector2 adjustedRight = new Vector2(((nextPosX-imageDim.x/2)/100f), (nextPosY-imageDim.y/2)/100f);
                 vertices2D.Add(new Vector2(adjustedRight.x, adjustedRight.y));
+
+                if (adjustedLeft.x == lowX || adjustedRight.x == lowX)
+                {
+                    containsLowX = true;
+                }
+
+                if (adjustedLeft.y == lowY || adjustedRight.y == lowY)
+                {
+                    containsLowY = true;
+                }
+                if (adjustedLeft.x == highX || adjustedRight.x == highX)
+                {
+                    containsHighX = true;
+                }
+                if (adjustedLeft.y == highY || adjustedRight.y == highY)
+                {
+                    containsHighY = true;
+                }
+            }
+
+            // Add corners to vertices list if needed
+            if (containsLowX && containsLowY) 
+            {
+                vertices2D.Add(new Vector2(lowX, lowY));
+            }
+            else if (containsHighX && containsHighY) 
+            {
+                vertices2D.Add(new Vector2(highX, highY));
+            }
+            else if (containsLowX && containsHighY) 
+            {
+                vertices2D.Add(new Vector2(lowX, highY));
+            }
+            else if (containsHighX && containsLowY) 
+            {
+                vertices2D.Add(new Vector2(highX, lowY));
             }
 
             // Remove duplicates from vertices list
@@ -100,6 +146,8 @@ public class TestMesh : MonoBehaviour
             int[] indices = tr.Triangulate();
 
             GameObject go = new GameObject("Empty");
+            go.transform.position = new Vector3(0, -2, 2);
+
             go.AddComponent<MeshFilter>();
             go.AddComponent<MeshRenderer>();
 
@@ -110,7 +158,7 @@ public class TestMesh : MonoBehaviour
             mesh.triangles = indices;
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
-            mesh.uv = uniqueVerticesArray;
+            //mesh.uv = uniqueVerticesArray;
 
             Texture2D texture = new Texture2D(128, 128);
 
@@ -129,6 +177,13 @@ public class TestMesh : MonoBehaviour
             mat.mainTexture = texture;
 
             go.GetComponent<MeshRenderer>().material = mat; 
+
+
+            PolygonCollider2D newCollider = go.AddComponent<PolygonCollider2D>();
+            newCollider.points = uniqueVerticesArray;
+            newCollider.SetPath(0, uniqueVerticesArray);
+            newCollider.isTrigger = true;
+
             index += 1;
         }
     }
