@@ -9,6 +9,7 @@ public class TestDiagram : MonoBehaviour
 {
 // The number of polygons/sites we want
     public int polygonNumber = 50;
+
  
     // This is where we will store the resulting data
     private Dictionary<Vector2f, Site> sites;

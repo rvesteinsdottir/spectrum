@@ -1,26 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 using csDelaunay;
 
 [RequireComponent(typeof(MeshFilter))]
 public class TestMesh : MonoBehaviour
 {
-    public int polygonNumber = 40;
+    private int polygonNumber = 10;
+    public Color startColor;
+    public Color endColor;
  
     // This is where we will store the resulting data
     private Dictionary<Vector2f, Site> sites;
     private List<Edge> edges;
     private List<Vector2f> points;
+    private Vector2 imageDim; 
 
     void Start() {
         // Create your sites (lets call that the center of your polygons)
         points = CreateRandomPoint();
+        imageDim = new Vector2(512, 512);
     
-        Rectf bounds = new Rectf(0,0,512,512);
-       
-        Voronoi voronoi = new Voronoi(points,bounds,5);
+        Rectf bounds = new Rectf(0,0,imageDim.x,imageDim.y);
+        Voronoi voronoi = new Voronoi(points,bounds);
  
         
         sites = voronoi.SitesIndexedByLocation;
@@ -40,88 +44,128 @@ public class TestMesh : MonoBehaviour
     }
 
     private void DisplayVoronoiDiagram() {
+        Debug.Log(sites.Count);
+
         foreach(KeyValuePair<Vector2f, Site> entry in sites)
         {
             Site newSite = entry.Value;
+            float sitePosX = ((newSite.x - imageDim.x/2)/100f);
+            float sitePosY = ((newSite.y - imageDim.x/2)/100f);
+            Vector2 center = new Vector2(sitePosX, sitePosY);
+
+
             List<Edge> siteEdges = newSite.Edges;
-            Vector2[] vertices2D = new Vector2[siteEdges.Count];
+            List<Vector2> vertices2D = new List<Vector2>();
+            //Vector3[] meshVertices = new Vector3[siteEdges.Count];
+            Debug.Log($"site {center}");
+
+            // reduce to an array of all vertices of each edge
             for (int i = 0; i < siteEdges.Count; i++)
             {
                 if (siteEdges[i].ClippedEnds == null) continue;
+                float posX = siteEdges[i].ClippedEnds[LR.LEFT].x; 
+                float posY = siteEdges[i].ClippedEnds[LR.LEFT].y;
 
-                vertices2D[i] = new Vector2(siteEdges[i].ClippedEnds[LR.LEFT].x, siteEdges[i].ClippedEnds[LR.LEFT].y);
-                Debug.Log(vertices2D[i]);
+                Vector2 adjustedLeft = new Vector2(((posX-imageDim.x/2)/100f), (posY-imageDim.y/2)/100f);
+                vertices2D.Add(new Vector2(adjustedLeft.x, adjustedLeft.y));
 
+                posX = siteEdges[i].ClippedEnds[LR.RIGHT].x; 
+                posY = siteEdges[i].ClippedEnds[LR.RIGHT].y;
 
-                // Use the triangulator to get indices for creating triangles
-                Triangulator tr = new Triangulator(vertices2D);
-                int[] indices = tr.Triangulate();
-
-                // Create the Vector3 vertices
-                Vector3[] vertices = new Vector3[vertices2D.Length];
-                for (int j=0; j<vertices.Length; j++) {
-                    vertices[j] = new Vector3(vertices2D[j].x, vertices2D[j].y, 0);
-                }
-
-                // Create the mesh
-                Mesh msh = new Mesh();
-                msh = GetComponent<MeshFilter> ().mesh;  
-                msh.vertices = vertices;
-                msh.triangles = indices;
-                msh.RecalculateNormals();
-                msh.RecalculateBounds();
-
-                // Set up game object with mesh;
-                gameObject.AddComponent(typeof(MeshRenderer));
-                // MeshFilter filter = gameObject.AddComponent(typeof(MeshFilter)) as MeshFilter;
-                // filter.mesh = msh;
+                Vector2 adjustedRight = new Vector2(((posX-imageDim.x/2)/100f), (posY-imageDim.y/2)/100f);
+                vertices2D.Add(new Vector2(adjustedRight.x, adjustedRight.y));
             }
+
+            // Remove duplicates from vertices list
+            List<Vector2> uniqueVertices = vertices2D.Distinct().ToList();
+            Debug.Log(vertices2D.Count);
+            Debug.Log(uniqueVertices.Count);
+
+            // Sort list in counter clockwise order
+            uniqueVertices.Sort((v, w) => compare(v, w, center));
+            Vector2[] uniqueVerticesArray = uniqueVertices.ToArray();
+            Vector3[] vertices3D = new Vector3[uniqueVerticesArray.Length];
+
+
+            for (int q = 0; q < uniqueVerticesArray.Length; q++)
+            {
+                vertices3D[q] = new Vector3(uniqueVerticesArray[q].x, uniqueVerticesArray[q].y, 0);
+                Debug.Log(vertices3D[q]);
+            }
+
+            // Use the triangulator to get indices for creating triangles
+            Triangulator tr = new Triangulator(uniqueVerticesArray);
+            int[] indices = tr.Triangulate();
+
+            GameObject go = new GameObject("Empty");
+            go.AddComponent<MeshFilter>();
+            go.AddComponent<MeshRenderer>();
+
+            Mesh msh = go.GetComponent<MeshFilter>().mesh;
+
+            msh.Clear();
+            msh.vertices = vertices3D;
+            msh.triangles = indices;
+            msh.RecalculateNormals();
+            msh.RecalculateBounds();
+            msh.uv = uniqueVerticesArray;
+            //go.GetComponent<MeshRenderer>().material.SetColor("_Color", Color.white);
+            // Destroy(go.GetComponent<MeshRenderer>().material);
+
+
+            Texture2D texture = new Texture2D(128, 128);
+
+            for (int y = 0; y < texture.height; y++)
+            {
+                for (int x = 0; x < texture.width; x++)
+                {
+                    Color color = Color.blue;
+                    texture.SetPixel(x, y, color);
+                }
+            }
+            
+            texture.Apply();
+
+            Material mat = new Material(Shader.Find("Unlit/Texture"));
+            mat.mainTexture = texture;
+
+            go.GetComponent<MeshRenderer>().material = mat; 
+
         }
-        // List<Edge> meshEdges = sites[points[0]].Edges;
-
-        // Debug.Log(meshEdges[0].ClippedEnds[LR.LEFT]);
-
- 
     }
 
-    // void Start () {
-    //     // Create Vector2 vertices
-    //     Vector2[] vertices2D = new Vector2[] {
-    //         new Vector2(0,0),
-    //         new Vector2(0,50),
-    //         new Vector2(50,50),
-    //         new Vector2(50,100),
-    //         new Vector2(0,100),
-    //         new Vector2(0,150),
-    //         new Vector2(150,150),
-    //         new Vector2(150,100),
-    //         new Vector2(100,100),
-    //         new Vector2(100,50),
-    //         new Vector2(150,50),
-    //         new Vector2(150,0),
-    //     };
- 
-    //     // Use the triangulator to get indices for creating triangles
-    //     Triangulator tr = new Triangulator(vertices2D);
-    //     int[] indices = tr.Triangulate();
- 
-    //     // Create the Vector3 vertices
-    //     Vector3[] vertices = new Vector3[vertices2D.Length];
-    //     for (int i=0; i<vertices.Length; i++) {
-    //         vertices[i] = new Vector3(vertices2D[i].x, vertices2D[i].y, 0);
-    //     }
- 
-    //     // Create the mesh
-    //     Mesh msh = new Mesh();
-    //     msh = GetComponent<MeshFilter> ().mesh;  
-    //     msh.vertices = vertices;
-    //     msh.triangles = indices;
-    //     msh.RecalculateNormals();
-    //     msh.RecalculateBounds();
- 
-    //     // Set up game object with mesh;
-    //     gameObject.AddComponent(typeof(MeshRenderer));
-    //     // MeshFilter filter = gameObject.AddComponent(typeof(MeshFilter)) as MeshFilter;
-    //     // filter.mesh = msh;
-    // }
+    // Method adapted from Stack OverFlow answer from ciamej on August 8, 2011 (https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order)
+    int compare (Vector2 a, Vector2 b, Vector2 center)
+    {
+        if (a.x - center.x >= 0 && b.x - center.x < 0)
+            //return true;
+            return 1;
+        if (a.x - center.x < 0 && b.x - center.x >= 0)
+            //return false;
+            return -1;
+        if (a.x - center.x == 0 && b.x - center.x == 0) {
+            if (a.y - center.y >= 0 || b.y - center.y >= 0)
+                //return a.y > b.y;
+                return a.y > b.y ? 1 : -1;
+            //return b.y > a.y;
+            return b.y > a.y ? 1 : -1;
+        }
+
+        // compute the cross product of vectors (center -> a) x (center -> b)
+        float det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
+        if (det < 0)
+            //return true;
+            return 1;
+        if (det > 0)
+            //return false;
+            return -1;
+
+        // points a and b are on the same line from the center
+        // check which point is closer to the center
+        float d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
+        float d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
+        //return d1 > d2;
+        return d1 > d2 ? 1 : -1;
+    }
+
 }
