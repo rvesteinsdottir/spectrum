@@ -51,74 +51,77 @@ public class TestMesh : MonoBehaviour
 
     private void DisplayDiagram() {
         Color tileWidth = ((endColor - startColor)/imageDim.x);
-        int index = 0;
         
         foreach(KeyValuePair<Vector2f, Site> entry in sites)
         {
             float sitePosX = ((entry.Value.x - imageDim.x/2)/100f);
             float sitePosY = ((entry.Value.y - imageDim.x/2)/100f);
-            Vector2 center = new Vector2(sitePosX, sitePosY);
-            List<Vector2> vertices2D = GenerateVertices(entry.Value);
+            
+            // Generate mesh vertices from Voronoi region edges
+            List<Vector2> allVertices = GenerateVertices(entry.Value);
 
             // Remove duplicates from vertices list
-            List<Vector2> uniqueVertices = vertices2D.Distinct().ToList();
+            List<Vector2> uniqueVerticesList = allVertices.Distinct().ToList();
 
-            // Sort list in counter clockwise order
-            uniqueVertices.Sort((v, w) => compare(v, w, center));
-            Vector2[] uniqueVerticesArray = uniqueVertices.ToArray();
-            Vector3[] vertices3D = new Vector3[uniqueVerticesArray.Length];
+            // Sort list in counter clockwise order for triangulation
+            uniqueVerticesList.Sort((v, w) => compare(v, w, new Vector2(sitePosX, sitePosY)));
 
+            Color tileColor = (startColor + (tileWidth * entry.Value.y));
+            Vector2[] uniqueVerticesArray = uniqueVerticesList.ToArray();
 
-            for (int q = 0; q < uniqueVerticesArray.Length; q++)
-            {
-                vertices3D[q] = new Vector3(uniqueVerticesArray[q].x, uniqueVerticesArray[q].y, 1);
-            }
-
-            // Use the triangulator to get indices for creating triangles
-            Triangulator tr = new Triangulator(uniqueVerticesArray);
-            int[] indices = tr.Triangulate();
-
-            GameObject go = new GameObject("Empty");
-            go.transform.position = new Vector3(0, -2, -2);
-
-            go.AddComponent<MeshFilter>();
-            go.AddComponent<MeshRenderer>();
-
-            Mesh mesh = go.GetComponent<MeshFilter>().mesh;
-
-            mesh.Clear();
-            mesh.vertices = vertices3D;
-            mesh.triangles = indices;
-            mesh.RecalculateNormals();
-            mesh.RecalculateBounds();
-            //mesh.uv = uniqueVerticesArray;
-
-            Texture2D texture = new Texture2D(128, 128);
-
-            for (int y = 0; y < texture.height; y++)
-            {
-                for (int x = 0; x < texture.width; x++)
-                {
-                    Color color = (startColor + (tileWidth * entry.Value.y));
-                    texture.SetPixel(x, y, color);
-                }
-            }
-            
-            texture.Apply();
-
-            Material mat = new Material(Shader.Find("Unlit/Texture"));
-            mat.mainTexture = texture;
-
-            go.GetComponent<MeshRenderer>().material = mat; 
-
-
-            PolygonCollider2D newCollider = go.AddComponent<PolygonCollider2D>();
-            newCollider.points = uniqueVerticesArray;
-            newCollider.SetPath(0, uniqueVerticesArray);
-            newCollider.isTrigger = true;
-
-            index += 1;
+            GenerateGameObject(uniqueVerticesArray, tileColor);
         }
+    }
+
+
+    private void GenerateGameObject(Vector2[] uniqueVerticesArray, Color tileColor)
+    {
+        GameObject newGameObject = new GameObject("MeshPolygon");
+        newGameObject.transform.position = new Vector3(0, -2, -2);
+
+        GenerateMesh(newGameObject, uniqueVerticesArray);
+
+        // Add texture based on y position of center
+        Texture2D texture = new Texture2D(128, 128);
+        for (int y = 0; y < texture.height; y++)
+        {
+            for (int x = 0; x < texture.width; x++)
+                texture.SetPixel(x, y, tileColor);
+        }
+        texture.Apply();
+        Material newMaterial = new Material(Shader.Find("Unlit/Texture"));
+        newMaterial.mainTexture = texture;
+        newGameObject.GetComponent<MeshRenderer>().material = newMaterial; 
+
+        // Add polygon collider
+        PolygonCollider2D newCollider = newGameObject.AddComponent<PolygonCollider2D>();
+        newCollider.points = uniqueVerticesArray;
+        newCollider.SetPath(0, uniqueVerticesArray);
+        newCollider.isTrigger = true;
+    }
+
+    private void GenerateMesh(GameObject newGameObject, Vector2[] uniqueVerticesArray)
+    {
+        Vector3[] uniqueVertices3D = new Vector3[uniqueVerticesArray.Length];
+
+        for (int i = 0; i < uniqueVerticesArray.Length; i++)
+        {
+            uniqueVertices3D[i] = new Vector3(uniqueVerticesArray[i].x, uniqueVerticesArray[i].y, 1);
+        }
+        newGameObject.AddComponent<MeshFilter>();
+        newGameObject.AddComponent<MeshRenderer>();
+
+        // Use the triangulator to get indices for creating mesh triangles
+        Triangulator tr = new Triangulator(uniqueVerticesArray);
+        int[] indices = tr.Triangulate();
+
+        // Add mesh to new game object
+        Mesh mesh = newGameObject.GetComponent<MeshFilter>().mesh;
+        mesh.Clear();
+        mesh.vertices = uniqueVertices3D;
+        mesh.triangles = indices;
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
     }
 
     List<Vector2> GenerateVertices(Site newSite)
