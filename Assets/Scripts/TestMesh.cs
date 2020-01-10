@@ -2,39 +2,45 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-
 using csDelaunay;
 
 [RequireComponent(typeof(MeshFilter))]
 public class TestMesh : MonoBehaviour
 {
-    private int polygonNumber = 10;
+    private int polygonNumber = 15;
     private Color startColor = Color.red;
     private Color endColor = Color.blue;
+    private Vector2 imageDim = new Vector2(512, 512);
  
-    // This is where we will store the resulting data
+    private List<Vector2f> points;
     private Dictionary<Vector2f, Site> sites;
     private List<Edge> edges;
-    private List<Vector2f> points;
-    private Vector2 imageDim; 
+           
+    private float highX;
+    private float highY;
+    private float lowX;
+    private float lowY;
 
     void Start() {
-        // Create your sites (lets call that the center of your polygons)
+        // Create random points
         points = CreateRandomPoint();
-        imageDim = new Vector2(512, 512);
+        highX = ((imageDim.x/2)/100f);
+        highY = ((imageDim.y/2)/100f);
+        lowX = -highX;
+        lowY = -highY;
     
         Rectf bounds = new Rectf(0,0,imageDim.x,imageDim.y);
         Voronoi voronoi = new Voronoi(points,bounds);
  
-        
         sites = voronoi.SitesIndexedByLocation;
         edges = voronoi.Edges;
-        //triangles = voronoi.Triangles;
  
-        DisplayVoronoiDiagram();
+        DisplayDiagram();
     }
 
-     private List<Vector2f> CreateRandomPoint() {
+
+    // Method from csDelunay library creator PouletFrit on May 26, 2014 via Unity Forum (https://forum.unity.com/threads/delaunay-voronoi-diagram-library-for-unity.248962/)
+    private List<Vector2f> CreateRandomPoint() {
         List<Vector2f> points = new List<Vector2f>();
         for (int i = 0; i < polygonNumber; i++) {
             points.Add(new Vector2f(Random.Range(0,512), Random.Range(0,512)));
@@ -43,91 +49,19 @@ public class TestMesh : MonoBehaviour
         return points;
     }
 
-    private void DisplayVoronoiDiagram() {
-        Debug.Log(sites.Count);
-        Color tileWidth = ((endColor - startColor)/polygonNumber);
+    private void DisplayDiagram() {
+        Color tileWidth = ((endColor - startColor)/imageDim.x);
         int index = 0;
-       
-        float highX = ((imageDim.x/2)/100f);
-        float highY = ((imageDim.y/2)/100f);
-        float lowX = -highX;
-        float lowY = -highY;
         
-
         foreach(KeyValuePair<Vector2f, Site> entry in sites)
         {
-            Site newSite = entry.Value;
-            float sitePosX = ((newSite.x - imageDim.x/2)/100f);
-            float sitePosY = ((newSite.y - imageDim.x/2)/100f);
+            float sitePosX = ((entry.Value.x - imageDim.x/2)/100f);
+            float sitePosY = ((entry.Value.y - imageDim.x/2)/100f);
             Vector2 center = new Vector2(sitePosX, sitePosY);
-            bool containsLowX = false;
-            bool containsLowY = false;
-            bool containsHighX = false;
-            bool containsHighY = false;
-
-            List<Edge> siteEdges = newSite.Edges;
-            List<Vector2> vertices2D = new List<Vector2>();
-            //Vector3[] meshVertices = new Vector3[siteEdges.Count];
-            Debug.Log($"site {center}");
-
-            // reduce to an array of all vertices of each edge
-            for (int i = 0; i < siteEdges.Count; i++)
-            {
-                if (siteEdges[i].ClippedEnds == null) continue;
-
-                float posX = siteEdges[i].ClippedEnds[LR.LEFT].x; 
-                float posY = siteEdges[i].ClippedEnds[LR.LEFT].y;
-
-                Vector2 adjustedLeft = new Vector2(((posX-imageDim.x/2)/100f), (posY-imageDim.y/2)/100f);
-                vertices2D.Add(new Vector2(adjustedLeft.x, adjustedLeft.y));
-
-                float nextPosX = siteEdges[i].ClippedEnds[LR.RIGHT].x; 
-                float nextPosY = siteEdges[i].ClippedEnds[LR.RIGHT].y;
-
-                Vector2 adjustedRight = new Vector2(((nextPosX-imageDim.x/2)/100f), (nextPosY-imageDim.y/2)/100f);
-                vertices2D.Add(new Vector2(adjustedRight.x, adjustedRight.y));
-
-                if (adjustedLeft.x == lowX || adjustedRight.x == lowX)
-                {
-                    containsLowX = true;
-                }
-
-                if (adjustedLeft.y == lowY || adjustedRight.y == lowY)
-                {
-                    containsLowY = true;
-                }
-                if (adjustedLeft.x == highX || adjustedRight.x == highX)
-                {
-                    containsHighX = true;
-                }
-                if (adjustedLeft.y == highY || adjustedRight.y == highY)
-                {
-                    containsHighY = true;
-                }
-            }
-
-            // Add corners to vertices list if needed
-            if (containsLowX && containsLowY) 
-            {
-                vertices2D.Add(new Vector2(lowX, lowY));
-            }
-            else if (containsHighX && containsHighY) 
-            {
-                vertices2D.Add(new Vector2(highX, highY));
-            }
-            else if (containsLowX && containsHighY) 
-            {
-                vertices2D.Add(new Vector2(lowX, highY));
-            }
-            else if (containsHighX && containsLowY) 
-            {
-                vertices2D.Add(new Vector2(highX, lowY));
-            }
+            List<Vector2> vertices2D = GenerateVertices(entry.Value);
 
             // Remove duplicates from vertices list
             List<Vector2> uniqueVertices = vertices2D.Distinct().ToList();
-            Debug.Log(vertices2D.Count);
-            Debug.Log(uniqueVertices.Count);
 
             // Sort list in counter clockwise order
             uniqueVertices.Sort((v, w) => compare(v, w, center));
@@ -137,8 +71,7 @@ public class TestMesh : MonoBehaviour
 
             for (int q = 0; q < uniqueVerticesArray.Length; q++)
             {
-                vertices3D[q] = new Vector3(uniqueVerticesArray[q].x, uniqueVerticesArray[q].y, 0);
-                Debug.Log(vertices3D[q]);
+                vertices3D[q] = new Vector3(uniqueVerticesArray[q].x, uniqueVerticesArray[q].y, 1);
             }
 
             // Use the triangulator to get indices for creating triangles
@@ -146,7 +79,7 @@ public class TestMesh : MonoBehaviour
             int[] indices = tr.Triangulate();
 
             GameObject go = new GameObject("Empty");
-            go.transform.position = new Vector3(0, -2, 2);
+            go.transform.position = new Vector3(0, -2, -2);
 
             go.AddComponent<MeshFilter>();
             go.AddComponent<MeshRenderer>();
@@ -166,7 +99,7 @@ public class TestMesh : MonoBehaviour
             {
                 for (int x = 0; x < texture.width; x++)
                 {
-                    Color color = (startColor + (tileWidth * index));
+                    Color color = (startColor + (tileWidth * entry.Value.y));
                     texture.SetPixel(x, y, color);
                 }
             }
@@ -186,6 +119,61 @@ public class TestMesh : MonoBehaviour
 
             index += 1;
         }
+    }
+
+    List<Vector2> GenerateVertices(Site newSite)
+    {
+        
+        float sitePosX = ((newSite.x - imageDim.x/2)/100f);
+        float sitePosY = ((newSite.y - imageDim.x/2)/100f);
+        Vector2 center = new Vector2(sitePosX, sitePosY);
+        bool containsLowX = false;
+        bool containsLowY = false;
+        bool containsHighX = false;
+        bool containsHighY = false;
+
+        List<Edge> siteEdges = newSite.Edges;
+        List<Vector2> vertices2D = new List<Vector2>();
+
+        // Reduce to an array of all vertices of each edge
+        for (int i = 0; i < siteEdges.Count; i++)
+        {
+            if (siteEdges[i].ClippedEnds == null) continue;
+            
+            Vector2 leftVertex = new Vector2(siteEdges[i].ClippedEnds[LR.LEFT].x, siteEdges[i].ClippedEnds[LR.LEFT].y);
+            Vector2 adjustedLeft = new Vector2(((leftVertex.x-imageDim.x/2)/100f), (leftVertex.y-imageDim.y/2)/100f);
+
+            Vector2 rightVertex = new Vector2(siteEdges[i].ClippedEnds[LR.RIGHT].x, siteEdges[i].ClippedEnds[LR.RIGHT].y);
+            Vector2 adjustedRight = new Vector2(((rightVertex.x-imageDim.x/2)/100f), (rightVertex.y-imageDim.y/2)/100f);
+            
+            vertices2D.Add(new Vector2(adjustedLeft.x, adjustedLeft.y));
+            vertices2D.Add(new Vector2(adjustedRight.x, adjustedRight.y));
+
+            if (adjustedLeft.x == lowX || adjustedRight.x == lowX)
+                containsLowX = true;
+
+            if (adjustedLeft.y == lowY || adjustedRight.y == lowY)
+                containsLowY = true;
+
+            if (adjustedLeft.x == highX || adjustedRight.x == highX)
+                containsHighX = true;
+            
+            if (adjustedLeft.y == highY || adjustedRight.y == highY)
+                containsHighY = true;
+        }
+
+        // Add corners to vertices list if needed
+        if (containsLowX && containsLowY) 
+            vertices2D.Add(new Vector2(lowX, lowY));
+        else if (containsHighX && containsHighY) 
+            vertices2D.Add(new Vector2(highX, highY));
+        else if (containsLowX && containsHighY) 
+            vertices2D.Add(new Vector2(lowX, highY));
+        else if (containsHighX && containsLowY) 
+            vertices2D.Add(new Vector2(highX, lowY));
+
+
+        return vertices2D;
     }
 
     // Method adapted from Stack OverFlow answer from ciamej on August 8, 2011 (https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order)
