@@ -7,19 +7,20 @@ using csDelaunay;
 [RequireComponent(typeof(MeshFilter))]
 public class TestMesh : MonoBehaviour
 {
-    private int polygonNumber = 15;
-    private Color startColor = Color.red;
-    private Color endColor = Color.blue;
-    private Vector2 imageDim = new Vector2(512, 512);
+    public int polygonNumber = 10;
+    public Color startColor = Color.red;
+    public Color endColor = Color.blue;
+    public Vector2 imageDim = new Vector2(512, 512);
+    public Color[] colorArray;
  
     private List<Vector2f> points;
     private Dictionary<Vector2f, Site> sites;
     private List<Edge> edges;
-           
     private float highX;
     private float highY;
     private float lowX;
     private float lowY;
+    private GameObject meshParent;
 
     void Start() {
         // Create random points
@@ -28,6 +29,8 @@ public class TestMesh : MonoBehaviour
         highY = ((imageDim.y/2)/100f);
         lowX = -highX;
         lowY = -highY;
+        meshParent = GameObject.Find("MeshParent");
+        colorArray = new Color[polygonNumber];
     
         Rectf bounds = new Rectf(0,0,imageDim.x,imageDim.y);
         Voronoi voronoi = new Voronoi(points,bounds);
@@ -51,6 +54,7 @@ public class TestMesh : MonoBehaviour
 
     private void DisplayDiagram() {
         Color tileWidth = ((endColor - startColor)/imageDim.x);
+        int index = 0;
         
         foreach(KeyValuePair<Vector2f, Site> entry in sites)
         {
@@ -67,16 +71,18 @@ public class TestMesh : MonoBehaviour
             uniqueVerticesList.Sort((v, w) => compare(v, w, new Vector2(sitePosX, sitePosY)));
 
             Color tileColor = (startColor + (tileWidth * entry.Value.y));
+            colorArray[index] = tileColor;
             Vector2[] uniqueVerticesArray = uniqueVerticesList.ToArray();
 
             GenerateGameObject(uniqueVerticesArray, tileColor);
+            index ++;
         }
     }
-
 
     private void GenerateGameObject(Vector2[] uniqueVerticesArray, Color tileColor)
     {
         GameObject newGameObject = new GameObject("MeshPolygon");
+        newGameObject.transform.SetParent(meshParent.transform);
         newGameObject.transform.position = new Vector3(0, -2, -2);
 
         GenerateMesh(newGameObject, uniqueVerticesArray);
@@ -212,5 +218,4 @@ public class TestMesh : MonoBehaviour
         //return d1 > d2;
         return d1 > d2 ? 1 : -1;
     }
-
 }

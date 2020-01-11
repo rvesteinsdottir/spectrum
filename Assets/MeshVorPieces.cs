@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VoronoiPieceManager : MonoBehaviour
+public class MeshVorPieces : MonoBehaviour
 {
-  private int puzzleSize;
+private int puzzleSize;
   private Color startColor;
   private Color endColor;
   private Color[] pixelColors;
   private List<Color> colorList;
   private Color[] colorArray;
   private Hashtable initialPosition;
-  // private Dictionary<Vector3, Color> desiredTilePosition = new Dictionary<Vector3, Color>();
   private Vector2 touchOffset;
   private bool draggingItem = false;
   private GameObject draggedObject;
@@ -29,10 +28,8 @@ public class VoronoiPieceManager : MonoBehaviour
     // Store Dictionary of desired tile position
     if (!onetime)
     {
-      VoronoiDiagram existingBoard = GameObject.Find("VoronoiDiagram").GetComponent<VoronoiDiagram>();
-      colorArray = existingBoard.regionColor;
-      pixelColors = existingBoard.pixelColors;
-      allColliders = existingBoard.allColliders;
+      TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+      colorArray = existingBoard.colorArray;
 
       colorList = new List<Color>();
       for (int index = 0; index < colorArray.Length; index++)
@@ -51,6 +48,9 @@ public class VoronoiPieceManager : MonoBehaviour
     else
     {
       if (draggingItem)
+      {
+          
+      }
         DropItem();
     }
   }
@@ -65,7 +65,7 @@ public class VoronoiPieceManager : MonoBehaviour
     }
   }
 
-  // Method adapted from Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
+  //Method adapted from Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
   private void DragOrPickUp()
   {
     var inputPosition = CurrentTouchPosition;
@@ -106,10 +106,8 @@ public class VoronoiPieceManager : MonoBehaviour
 
   void DropItem()
   {
-    GameObject puzzleBoard = GameObject.Find("VoronoiDiagram");
-    Transform puzzleTransform = puzzleBoard.transform;
-    Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
-
+    TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+    //Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
 
     // see if dropping item on a collider
     var inputPosition = CurrentTouchPosition;
@@ -123,18 +121,19 @@ public class VoronoiPieceManager : MonoBehaviour
       if (hit.collider != null)
       {
         selectedCollider = hit.collider;
-        int colliderIndex = System.Array.IndexOf(allColliders, selectedCollider);
-        int boxIndex = System.Array.IndexOf(colorArray, draggedObjectColor);
+        Debug.Log(selectedCollider);
+        // int colliderIndex = System.Array.IndexOf(allColliders, selectedCollider);
+        // int boxIndex = System.Array.IndexOf(colorArray, draggedObjectColor);
 
         // Determines if box landed on correct region
-        if (colliderIndex == boxIndex)
-        {
-          correctMatches.Add(draggedObjectColor);
-          Destroy(draggedObject);
-          Debug.Log(selectedCollider.bounds);
-          puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
-          puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
-        }
+        // if (colliderIndex == boxIndex)
+        // {
+        //   correctMatches.Add(draggedObjectColor);
+        //   Destroy(draggedObject);
+        //   Debug.Log(selectedCollider.bounds);
+        //   puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
+        //   puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
+        // }
       }
     }
 
@@ -144,14 +143,11 @@ public class VoronoiPieceManager : MonoBehaviour
 
   private void GenerateVariables()
   {
-    GameObject puzzleBoard = GameObject.Find("VoronoiDiagram");
-    Transform puzzleTransform = puzzleBoard.transform;
-    VoronoiDiagram existingBoard = puzzleBoard.GetComponent<VoronoiDiagram>();
+    TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
 
-    puzzleSize = existingBoard.regionAmount;
+    puzzleSize = existingBoard.polygonNumber;
     startColor = existingBoard.startColor;
     endColor = existingBoard.endColor;
-    pixelColors = existingBoard.pixelColors;
   }
 
   private void GenerateTiles()
