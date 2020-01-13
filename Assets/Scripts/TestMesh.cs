@@ -84,6 +84,7 @@ public class TestMesh : MonoBehaviour
         GameObject newGameObject = new GameObject("MeshPolygon");
         newGameObject.transform.SetParent(meshParent.transform);
         newGameObject.transform.position = new Vector3(0, -2, -2);
+        newGameObject.layer = LayerMask.NameToLayer("Board");
 
         GenerateMesh(newGameObject, uniqueVerticesArray);
 
