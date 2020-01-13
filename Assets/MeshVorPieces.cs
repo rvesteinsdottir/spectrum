@@ -12,6 +12,7 @@ private int puzzleSize;
   private Color[] colorArray;
   private Hashtable initialPosition;
   private Vector2 touchOffset;
+  private Vector3 touchOffset3D;
   private bool draggingItem = false;
   private GameObject draggedObject;
   public IList<Color> correctMatches = new List<Color>();
@@ -72,7 +73,9 @@ private int puzzleSize;
 
     if (draggingItem)
     {
-      draggedObject.transform.position = inputPosition + touchOffset;
+        Vector2 newLocation = inputPosition + touchOffset;
+      //draggedObject.transform.position = inputPosition + touchOffset;
+      draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -1);
     }
     else
     {
@@ -90,7 +93,7 @@ private int puzzleSize;
           touchOffset = (Vector2)hit.transform.position - inputPosition;
 
           // Increase object size when being dragged
-          draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+          draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, -1.2f);
         }
       }
     }
@@ -138,7 +141,7 @@ private int puzzleSize;
     }
 
     draggingItem = false;
-    draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
+    draggedObject.transform.localScale = new Vector3(1f, 1f, -1f);
   }
 
   private void GenerateVariables()
@@ -168,7 +171,7 @@ private int puzzleSize;
         posY -= 1;
       }
 
-      tile.transform.position = new Vector3(posX, posY, 1f);
+      tile.transform.position = new Vector3(posX, posY, -1f);
 
       // Assign random color to tile
       int randomIndex = Random.Range(0, colorList.Count);
@@ -185,6 +188,6 @@ private int puzzleSize;
     float gridHeight = tileSize * 2;
 
     //Changes pivot point for tiles is in the center
-    transform.position = new Vector3(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2, 1);
+    transform.position = new Vector3(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2, -1);
   }
 }
