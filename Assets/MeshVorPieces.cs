@@ -21,128 +21,145 @@ public class MeshVorPieces : MonoBehaviour
 
     void Start()
     {
-    GenerateVariables();
+        GenerateVariables();
     }
 
     private void Update()
     {   
-    // Store Dictionary of desired tile position
-    if (!onetime)
-    {
-        TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
-        colorArray = existingBoard.colorArray;
-
-        colorList = new List<Color>();
-        for (int index = 0; index < colorArray.Length; index++)
+        // Store Dictionary of desired tile position
+        if (!onetime)
         {
-        colorList.Add(colorArray[index]);
+            TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+            colorArray = existingBoard.colorArray;
+
+            colorList = new List<Color>();
+            for (int index = 0; index < colorArray.Length; index++)
+            {
+            colorList.Add(colorArray[index]);
+            }
+
+            GenerateTiles();
+            onetime = true;
         }
 
-        GenerateTiles();
-        onetime = true;
-    }
-
-    if (HasInput)
-    {
-        DragOrPickUp();
-    }
-    else
-    {
-        if (draggingItem)
-        DropItem();
-    }
+        if (HasInput)
+        {
+            DragOrPickUp();
+        }
+        else
+        {
+            if (draggingItem)
+                DropItem();
+        }
     }
 
     Vector2 CurrentTouchPosition
     {
-    get
-    {
-        Vector2 inputPos;
-        inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        return inputPos;
-    }
+        get
+        {
+            Vector2 inputPos;
+            inputPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            return inputPos;
+        }
     }
 
     //Method adapted from Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
     private void DragOrPickUp()
     {
-    var inputPosition = CurrentTouchPosition;
+        var inputPosition = CurrentTouchPosition;
 
-    if (draggingItem)
-    {
-        Vector2 newLocation = inputPosition + touchOffset;
-        draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -1);
-    }
-    else
-    {
-        int BoardLayerMask =~ LayerMask.GetMask("Board");
-
-        RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f, BoardLayerMask);
-
-        if (touches.Length > 0)
+        if (draggingItem)
         {
-        var hit = touches[0];
-        if (hit.transform != null)
-        {
-            draggingItem = true;
-            draggedObject = hit.transform.gameObject;
-            touchOffset = (Vector2)hit.transform.position - inputPosition;
-
-            // Increase object size when being dragged
-            draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, -1.2f);
+            Vector2 newLocation = inputPosition + touchOffset;
+            draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -1);
         }
-        }
-    }
-    }
-
-    private bool HasInput
-    {
-    get
-    {
-        return Input.GetMouseButton(0);
-    }
-    }
-
-    void DropItem()
-    {
-    TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
-    Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
-
-    // see if dropping item on a collider
-    var inputPosition = CurrentTouchPosition;
-    Collider2D selectedCollider;
-
-    // Is this layer mask doing anything?
-    RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f);
-
-    if (touches.Length > 0)
-    {
-
-        var hit = touches[0];
-        if (hit.collider != null)
+        else
         {
-            selectedCollider = hit.collider;
-            Texture2D colliderTexture = (Texture2D)selectedCollider.gameObject.GetComponent<Renderer>().material.mainTexture;
-            Color colliderColor = colliderTexture.GetPixel(0,0);
+            int BoardLayerMask =~ LayerMask.GetMask("Board");
 
-            // Dont need this
-            Debug.Log(RGBdiff (colliderColor, draggedObjectColor));
-            
-            //Determines if box landed on correct region
+            RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f, BoardLayerMask);
 
-            if ((RGBdiff (colliderColor, draggedObjectColor)) < 0.005)
+            if (touches.Length > 0)
             {
-                Debug.Log("match");
-                correctMatches.Add(draggedObjectColor);
-                Destroy(draggedObject);
-            //   puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
-            //   puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
+                var hit = touches[0];
+                if (hit.transform != null)
+                {
+                    draggingItem = true;
+                    draggedObject = hit.transform.gameObject;
+                    touchOffset = (Vector2)hit.transform.position - inputPosition;
+
+                    // Increase object size when being dragged
+                    draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, -1.2f);
+                }
             }
         }
     }
 
-    draggingItem = false;
-    draggedObject.transform.localScale = new Vector3(1f, 1f, -1f);
+    private bool HasInput
+    {
+        get
+        {
+            return Input.GetMouseButton(0);
+        }
+    }
+
+    void DropItem()
+    {
+        TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+        Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
+
+        // see if dropping item on a collider
+        var inputPosition = CurrentTouchPosition;
+        Collider2D selectedCollider;
+
+        // Is this layer mask doing anything?
+        RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f);
+
+        if (touches.Length > 0)
+        {
+            var hit = touches[0];
+            if (hit.collider != null)
+            {
+                selectedCollider = hit.collider;
+                Texture2D colliderTexture = (Texture2D)selectedCollider.gameObject.GetComponent<Renderer>().material.mainTexture;
+                Color colliderColor = colliderTexture.GetPixel(0,0);
+
+                // Dont need this
+                Debug.Log(RGBdiff (colliderColor, draggedObjectColor));
+                
+                //Determines if box landed on correct region
+
+                if ((RGBdiff (colliderColor, draggedObjectColor)) < 0.005)
+                {
+                    correctMatches.Add(draggedObjectColor);
+
+                    ChangeObjectColor(selectedCollider);
+                    Debug.Log(correctMatches.Count);
+
+                    Destroy(draggedObject);
+                //   puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
+                //   puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
+                }
+            }
+        }
+
+        draggingItem = false;
+        draggedObject.transform.localScale = new Vector3(1f, 1f, -1f);
+    }
+
+    private void ChangeObjectColor(Collider2D selectedCollider)
+    {
+        Material objectMaterial = selectedCollider.gameObject.GetComponent<Renderer>().material;
+        Texture2D texture = new Texture2D(128, 128);
+        for (int y = 0; y < texture.height; y++)
+        {
+            for (int x = 0; x < texture.width; x++)
+                texture.SetPixel(x, y, Color.white);
+        }
+        texture.Apply();
+
+        objectMaterial.mainTexture = texture;
+        selectedCollider.gameObject.GetComponent<MeshRenderer>().material = objectMaterial; 
     }
   
     float RGBdiff(Color c1, Color c2)
@@ -152,11 +169,11 @@ public class MeshVorPieces : MonoBehaviour
 
     private void GenerateVariables()
     {
-    TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+        TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
 
-    puzzleSize = existingBoard.polygonNumber;
-    startColor = existingBoard.startColor;
-    endColor = existingBoard.endColor;
+        puzzleSize = existingBoard.polygonNumber;
+        startColor = existingBoard.startColor;
+        endColor = existingBoard.endColor;
     }
 
     private void GenerateTiles()
@@ -173,8 +190,8 @@ public class MeshVorPieces : MonoBehaviour
             float posY = 5;
             if (i >= puzzleSize/2)
             {
-            posX = (i - puzzleSize/2) * tileSize + 0.5f;
-            posY -= 1;
+                posX = (i - puzzleSize/2) * tileSize + 0.5f;
+                posY -= 1;
             }
 
             tile.transform.position = new Vector3(posX, posY, -1f);
@@ -188,7 +205,6 @@ public class MeshVorPieces : MonoBehaviour
             tile.GetComponent<Renderer>().material.color = tileColor;
 
             initialPosition.Add(tileColor, tile.transform.position);
-
         }
 
         Destroy(referenceTile);
