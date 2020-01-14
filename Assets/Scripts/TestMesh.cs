@@ -206,6 +206,33 @@ public class TestMesh : MonoBehaviour
             vertices2D.Add(new Vector2(lowX, highY));
         else if (containsHighX && containsLowY) 
             vertices2D.Add(new Vector2(highX, lowY));
+        else if (containsHighY && containsLowY)
+        {
+            if (vertices2D[0].x > 0)
+            {
+                vertices2D.Add(new Vector2(highX, highY));
+                vertices2D.Add(new Vector2(highX, lowY));
+            }
+            else
+            {
+                vertices2D.Add(new Vector2(lowX, highY));
+                vertices2D.Add(new Vector2(lowX, lowY));
+            }
+        }
+        else if (containsHighX && containsLowX)
+        {
+            if (vertices2D[0].y > 0)
+            {
+                vertices2D.Add(new Vector2(lowX, highY));
+                vertices2D.Add(new Vector2(highX, highY));
+            }
+            else
+            {
+                vertices2D.Add(new Vector2(lowX, lowY));
+                vertices2D.Add(new Vector2(highX, lowY));
+            }
+
+        }
 
         return vertices2D;
     }
