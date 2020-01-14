@@ -30,18 +30,20 @@ public class MeshVorPieces : MonoBehaviour
         // Store Dictionary of desired tile position
         if (!onetime)
         {
+            onetime = true;
+
             TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+            puzzleSize = existingBoard.polygonNumber;
             colorArray = existingBoard.colorArray;
             allColliders = existingBoard.allColliders;
 
             colorList = new List<Color>();
             for (int index = 0; index < colorArray.Length; index++)
             {
-            colorList.Add(colorArray[index]);
+                colorList.Add(colorArray[index]);
             }
 
             GenerateTiles();
-            onetime = true;
         }
 
         if (HasInput)
@@ -114,13 +116,11 @@ public class MeshVorPieces : MonoBehaviour
         // see if dropping item on a collider
         var inputPosition = CurrentTouchPosition;
         Collider2D selectedCollider;
-        Texture2D colliderTexture;
-        Color colliderColor;
+
         // draggedObject.transform.localPosition = new Vector3(draggedObject.transform.localPosition.x, draggedObject.transform.localPosition.y, -2);
 
         // Is this layer mask doing anything?
         RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f);
-        Debug.Log(allColliders.Length);
 
         if (touches.Length > 0)
         {
@@ -131,18 +131,15 @@ public class MeshVorPieces : MonoBehaviour
                 // colliderTexture = (Texture2D)selectedCollider.gameObject.GetComponent<Renderer>().material.mainTexture;
                 int colliderIndex = System.Array.IndexOf(allColliders, selectedCollider);
                 int boxIndex = System.Array.IndexOf(colorArray, draggedObjectColor);
-                Debug.Log($"collider {colliderIndex} box {boxIndex}");
 
                 //Determines if box landed on correct region
 
                 if (colliderIndex == boxIndex)
                 {
-                    Debug.Log("match");
                     correctMatches.Add(draggedObjectColor);
                     selectedCollider.gameObject.GetComponent<MeshRenderer>().enabled = true;
 
                     ChangeObjectColor(selectedCollider);
-                    Debug.Log(correctMatches.Count);
 
                     Destroy(draggedObject);
                     // Destroy(selectedCollider.gameObject);
@@ -181,7 +178,7 @@ public class MeshVorPieces : MonoBehaviour
     {
         TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
 
-        puzzleSize = existingBoard.polygonNumber;
+        //puzzleSize = existingBoard.polygonNumber;
         startColor = existingBoard.startColor;
         endColor = existingBoard.endColor;
     }
@@ -210,6 +207,8 @@ public class MeshVorPieces : MonoBehaviour
 
             // Assign random color to tile
             int randomIndex = Random.Range(0, colorList.Count);
+            Debug.Log(puzzleSize);
+            Debug.Log(randomIndex);
             Color tileColor = colorList[randomIndex];
             colorList.RemoveAt(randomIndex);
             tile.GetComponent<Renderer>().material.color = tileColor;

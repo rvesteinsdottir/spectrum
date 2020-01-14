@@ -8,7 +8,7 @@ using System.IO;
 //[RequireComponent(typeof(MeshFilter))]
 public class TestMesh : MonoBehaviour
 {
-    public int polygonNumber = 10;
+    public int polygonNumber;
     public Color startColor = Color.red;
     public Color endColor = Color.blue;
     public Vector2 imageDim = new Vector2(512, 512);
@@ -25,12 +25,28 @@ public class TestMesh : MonoBehaviour
     public PolygonCollider2D[] allColliders;
 
     void Start() {
+        if(PlayerPrefs.GetInt("Level") == 1)
+        {
+            polygonNumber = 6;
+            Debug.Log($"easy {polygonNumber}");
+        }
+        else if (PlayerPrefs.GetInt("Level") == 2)
+        {
+            polygonNumber = 10;
+            Debug.Log("medium");
+        }
+        else
+        {
+            polygonNumber = 12;
+            Debug.Log("hard");
+        }
         // Create random points
         points = CreateRandomPoint();
         highX = ((imageDim.x/2)/100f);
         highY = ((imageDim.y/2)/100f);
         lowX = -highX;
         lowY = -highY;
+        
         meshParent = GameObject.Find("MeshParent");
         colorArray = new Color[polygonNumber];
     
