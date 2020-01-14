@@ -15,6 +15,7 @@ public class MeshVorPieces : MonoBehaviour
     private Vector3 touchOffset3D;
     private bool draggingItem = false;
     private GameObject draggedObject;
+    private Color draggedObjectColor;
     public IList<Color> correctMatches = new List<Color>();
     private bool onetime = false;
     private PolygonCollider2D[] allColliders;
@@ -31,6 +32,7 @@ public class MeshVorPieces : MonoBehaviour
         {
             TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
             colorArray = existingBoard.colorArray;
+            allColliders = existingBoard.allColliders;
 
             colorList = new List<Color>();
             for (int index = 0; index < colorArray.Length; index++)
@@ -71,7 +73,8 @@ public class MeshVorPieces : MonoBehaviour
         if (draggingItem)
         {
             Vector2 newLocation = inputPosition + touchOffset;
-            draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -1);
+            draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -1f);
+            //draggedObject.transform.position = newLocation;
         }
         else
         {
@@ -89,7 +92,7 @@ public class MeshVorPieces : MonoBehaviour
                     touchOffset = (Vector2)hit.transform.position - inputPosition;
 
                     // Increase object size when being dragged
-                    draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, -1.2f);
+                    draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
                 }
             }
         }
@@ -106,14 +109,18 @@ public class MeshVorPieces : MonoBehaviour
     void DropItem()
     {
         TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
-        Color draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
+        draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
 
         // see if dropping item on a collider
         var inputPosition = CurrentTouchPosition;
         Collider2D selectedCollider;
+        Texture2D colliderTexture;
+        Color colliderColor;
+        // draggedObject.transform.localPosition = new Vector3(draggedObject.transform.localPosition.x, draggedObject.transform.localPosition.y, -2);
 
         // Is this layer mask doing anything?
         RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f);
+        Debug.Log(allColliders.Length);
 
         if (touches.Length > 0)
         {
@@ -121,22 +128,24 @@ public class MeshVorPieces : MonoBehaviour
             if (hit.collider != null)
             {
                 selectedCollider = hit.collider;
-                Texture2D colliderTexture = (Texture2D)selectedCollider.gameObject.GetComponent<Renderer>().material.mainTexture;
-                Color colliderColor = colliderTexture.GetPixel(0,0);
+                // colliderTexture = (Texture2D)selectedCollider.gameObject.GetComponent<Renderer>().material.mainTexture;
+                int colliderIndex = System.Array.IndexOf(allColliders, selectedCollider);
+                int boxIndex = System.Array.IndexOf(colorArray, draggedObjectColor);
+                Debug.Log($"collider {colliderIndex} box {boxIndex}");
 
-                // Dont need this
-                Debug.Log(RGBdiff (colliderColor, draggedObjectColor));
-                
                 //Determines if box landed on correct region
 
-                if ((RGBdiff (colliderColor, draggedObjectColor)) < 0.005)
+                if (colliderIndex == boxIndex)
                 {
+                    Debug.Log("match");
                     correctMatches.Add(draggedObjectColor);
+                    selectedCollider.gameObject.GetComponent<MeshRenderer>().enabled = true;
 
                     ChangeObjectColor(selectedCollider);
                     Debug.Log(correctMatches.Count);
 
                     Destroy(draggedObject);
+                    // Destroy(selectedCollider.gameObject);
                 //   puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
                 //   puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
                 }
@@ -144,7 +153,8 @@ public class MeshVorPieces : MonoBehaviour
         }
 
         draggingItem = false;
-        draggedObject.transform.localScale = new Vector3(1f, 1f, -1f);
+        draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
+
     }
 
     private void ChangeObjectColor(Collider2D selectedCollider)
@@ -154,7 +164,7 @@ public class MeshVorPieces : MonoBehaviour
         for (int y = 0; y < texture.height; y++)
         {
             for (int x = 0; x < texture.width; x++)
-                texture.SetPixel(x, y, Color.white);
+                texture.SetPixel(x, y, draggedObjectColor);
         }
         texture.Apply();
 
@@ -194,7 +204,7 @@ public class MeshVorPieces : MonoBehaviour
                 posY -= 1;
             }
 
-            tile.transform.position = new Vector3(posX, posY, -1f);
+            tile.transform.position = new Vector3(posX, posY, -3f);
             tile.name = "SquareTile";
             tile.layer = LayerMask.NameToLayer("Piece");
 
@@ -213,6 +223,6 @@ public class MeshVorPieces : MonoBehaviour
         float gridHeight = tileSize * 2;
 
         //Changes pivot point for tiles is in the center
-        transform.position = new Vector3(-gridWidth/2 + tileSize/2, (gridHeight/2 - tileSize/2)-2, -1);
+        transform.position = new Vector3((-(gridWidth/2 + tileSize/2)), (gridHeight/2 - tileSize/2)-2, transform.position.z);
     }
 }

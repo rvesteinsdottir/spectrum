@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using csDelaunay;
+using System.IO;
 
-[RequireComponent(typeof(MeshFilter))]
+//[RequireComponent(typeof(MeshFilter))]
 public class TestMesh : MonoBehaviour
 {
     public int polygonNumber = 10;
@@ -21,6 +22,7 @@ public class TestMesh : MonoBehaviour
     private float lowX;
     private float lowY;
     private GameObject meshParent;
+    public PolygonCollider2D[] allColliders;
 
     void Start() {
         // Create random points
@@ -39,6 +41,7 @@ public class TestMesh : MonoBehaviour
         edges = voronoi.Edges;
  
         DisplayDiagram();
+        DisplayVoronoiDiagram();
     }
 
 
@@ -55,6 +58,7 @@ public class TestMesh : MonoBehaviour
     private void DisplayDiagram() {
         Color tileWidth = ((endColor - startColor)/imageDim.x);
         int index = 0;
+        allColliders = new PolygonCollider2D[polygonNumber];
         
         foreach(KeyValuePair<Vector2f, Site> entry in sites)
         {
@@ -71,40 +75,44 @@ public class TestMesh : MonoBehaviour
             uniqueVerticesList.Sort((v, w) => compare(v, w, new Vector2(sitePosX, sitePosY)));
 
             Color tileColor = (startColor + (tileWidth * entry.Value.y));
+            //Color tileColor = Color.white;
             colorArray[index] = tileColor;
             Vector2[] uniqueVerticesArray = uniqueVerticesList.ToArray();
 
-            GenerateGameObject(uniqueVerticesArray, tileColor);
+            allColliders[index] = GenerateGameObject(uniqueVerticesArray, tileColor);
             index ++;
         }
     }
 
-    private void GenerateGameObject(Vector2[] uniqueVerticesArray, Color tileColor)
+    PolygonCollider2D GenerateGameObject(Vector2[] uniqueVerticesArray, Color tileColor)
     {
         GameObject newGameObject = new GameObject("MeshPolygon");
         newGameObject.transform.SetParent(meshParent.transform);
-        newGameObject.transform.position = new Vector3(0, -2, -2);
+        newGameObject.transform.localPosition = new Vector3(0f, 0f, -2f);
         newGameObject.layer = LayerMask.NameToLayer("Board");
 
         GenerateMesh(newGameObject, uniqueVerticesArray);
 
         // Add texture based on y position of center
-        Texture2D texture = new Texture2D(128, 128);
+        Texture2D texture = new Texture2D(128, 128, TextureFormat.ARGB32, false);
         for (int y = 0; y < texture.height; y++)
         {
             for (int x = 0; x < texture.width; x++)
-                texture.SetPixel(x, y, tileColor);
+                texture.SetPixel(x, y, Color.white);
         }
         texture.Apply();
         Material newMaterial = new Material(Shader.Find("Unlit/Texture"));
         newMaterial.mainTexture = texture;
         newGameObject.GetComponent<MeshRenderer>().material = newMaterial; 
+        newGameObject.GetComponent<MeshRenderer>().enabled = false;
 
         // Add polygon collider
         PolygonCollider2D newCollider = newGameObject.AddComponent<PolygonCollider2D>();
         newCollider.points = uniqueVerticesArray;
         newCollider.SetPath(0, uniqueVerticesArray);
         newCollider.isTrigger = true;
+
+        return newCollider;
     }
 
     private void GenerateMesh(GameObject newGameObject, Vector2[] uniqueVerticesArray)
@@ -115,6 +123,7 @@ public class TestMesh : MonoBehaviour
         {
             uniqueVertices3D[i] = new Vector3(uniqueVerticesArray[i].x, uniqueVerticesArray[i].y, 1);
         }
+
         newGameObject.AddComponent<MeshFilter>();
         newGameObject.AddComponent<MeshRenderer>();
 
@@ -182,7 +191,6 @@ public class TestMesh : MonoBehaviour
         else if (containsHighX && containsLowY) 
             vertices2D.Add(new Vector2(highX, lowY));
 
-
         return vertices2D;
     }
 
@@ -218,5 +226,67 @@ public class TestMesh : MonoBehaviour
         float d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
         //return d1 > d2;
         return d1 > d2 ? 1 : -1;
+    }
+
+    private void DisplayVoronoiDiagram() {
+        
+        Texture2D tx = new Texture2D(512,512, TextureFormat.ARGB32, false);
+        GetComponent<SpriteRenderer>().sprite = Sprite.Create(tx, new Rect(0,0, imageDim.x, imageDim.y), (Vector2.one * 0.5f));
+        transform.localPosition = new Vector3(0, -2, -2f);
+ 
+        foreach (Edge edge in edges) {
+            // if the edge doesn't have clippedEnds, if was not within the bounds, dont draw it
+            if (edge.ClippedEnds == null) continue;
+ 
+            DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], tx, Color.black);
+
+            // Set remaining sections of texture to white
+            for (int row = 0; row < 512; row++)
+            {
+                for (int column = 0; column < 512; column++)
+                {
+                    if (tx.GetPixel(row, column) != Color.black)
+                    {
+                        tx.SetPixel(row, column, new Color (1,1,1,0));
+                    }
+                }
+            }
+        }
+
+        tx.filterMode = FilterMode.Point;
+        tx.Apply();
+        Material newMaterial = new Material(Shader.Find("Unlit/Texture"));
+        newMaterial.mainTexture = tx;
+
+        this.GetComponent<Renderer>().material.mainTexture = tx;
+    }
+ 
+    // Bresenham line algorithm
+    private void DrawLine(Vector2f p0, Vector2f p1, Texture2D tx, Color c, int offset = 0) {
+        int x0 = (int)p0.x;
+        int y0 = (int)p0.y;
+        int x1 = (int)p1.x;
+        int y1 = (int)p1.y;
+       
+        int dx = Mathf.Abs(x1-x0);
+        int dy = Mathf.Abs(y1-y0);
+        int sx = x0 < x1 ? 1 : -1;
+        int sy = y0 < y1 ? 1 : -1;
+        int err = dx-dy;
+       
+        while (true) {
+            tx.SetPixel(x0+offset,y0+offset,c);
+           
+            if (x0 == x1 && y0 == y1) break;
+            int e2 = 2*err;
+            if (e2 > -dy) {
+                err -= dy;
+                x0 += sx;
+            }
+            if (e2 < dx) {
+                err += dx;
+                y0 += sy;
+            }
+        }
     }
 }
