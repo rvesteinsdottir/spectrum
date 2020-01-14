@@ -57,7 +57,7 @@ public class TestMesh : MonoBehaviour
         edges = voronoi.Edges;
  
         DisplayDiagram();
-        DisplayVoronoiDiagram();
+        DisplayEdges();
     }
 
 
@@ -231,7 +231,6 @@ public class TestMesh : MonoBehaviour
                 vertices2D.Add(new Vector2(lowX, lowY));
                 vertices2D.Add(new Vector2(highX, lowY));
             }
-
         }
 
         return vertices2D;
@@ -241,37 +240,30 @@ public class TestMesh : MonoBehaviour
     int compare (Vector2 a, Vector2 b, Vector2 center)
     {
         if (a.x - center.x >= 0 && b.x - center.x < 0)
-            //return true;
             return 1;
         if (a.x - center.x < 0 && b.x - center.x >= 0)
-            //return false;
             return -1;
         if (a.x - center.x == 0 && b.x - center.x == 0) {
             if (a.y - center.y >= 0 || b.y - center.y >= 0)
-                //return a.y > b.y;
                 return a.y > b.y ? 1 : -1;
-            //return b.y > a.y;
             return b.y > a.y ? 1 : -1;
         }
 
         // compute the cross product of vectors (center -> a) x (center -> b)
         float det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
         if (det < 0)
-            //return true;
             return 1;
         if (det > 0)
-            //return false;
             return -1;
 
         // points a and b are on the same line from the center
         // check which point is closer to the center
         float d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
         float d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
-        //return d1 > d2;
         return d1 > d2 ? 1 : -1;
     }
 
-    private void DisplayVoronoiDiagram() {
+    private void DisplayEdges() {
         
         Texture2D tx = new Texture2D(512,512, TextureFormat.ARGB32, false);
         GetComponent<SpriteRenderer>().sprite = Sprite.Create(tx, new Rect(0,0, imageDim.x, imageDim.y), (Vector2.one * 0.5f));
@@ -290,7 +282,14 @@ public class TestMesh : MonoBehaviour
                 {
                     if (tx.GetPixel(row, column) != Color.black)
                     {
-                        tx.SetPixel(row, column, new Color (1,1,1,0));
+                        if (row <= 2 || column <= 2 || row >= 509 || column >= 509)
+                        {
+                            tx.SetPixel(row, column, Color.black);
+                        }
+                        else
+                        {
+                            tx.SetPixel(row, column, new Color (1,1,1,0));
+                        }
                     }
                 }
             }
@@ -319,6 +318,8 @@ public class TestMesh : MonoBehaviour
        
         while (true) {
             tx.SetPixel(x0+offset,y0+offset,c);
+            tx.SetPixel(x0+offset+1,y0+offset,c);
+            tx.SetPixel(x0+offset-1,y0+offset,c);
            
             if (x0 == x1 && y0 == y1) break;
             int e2 = 2*err;
