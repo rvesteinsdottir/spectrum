@@ -145,6 +145,9 @@ public class MeshVorPieces : MonoBehaviour
                     // Destroy(selectedCollider.gameObject);
                 //   puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
                 //   puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
+                } else 
+                {
+                    draggedObject.transform.position = ((Vector3)initialPosition[draggedObjectColor]);
                 }
             }
         }
@@ -188,6 +191,8 @@ public class MeshVorPieces : MonoBehaviour
         GameObject referenceTile = (GameObject)Instantiate(Resources.Load("SquareTile"));
         initialPosition = new Hashtable();
         int tileSize = 1;
+        float gridWidth = ((puzzleSize)/2) * tileSize;
+        float gridHeight = tileSize * 2;
 
         for (int i = 0; i < puzzleSize; i++)
         {
@@ -207,21 +212,20 @@ public class MeshVorPieces : MonoBehaviour
 
             // Assign random color to tile
             int randomIndex = Random.Range(0, colorList.Count);
-            Debug.Log(puzzleSize);
-            Debug.Log(randomIndex);
             Color tileColor = colorList[randomIndex];
             colorList.RemoveAt(randomIndex);
             tile.GetComponent<Renderer>().material.color = tileColor;
 
-            initialPosition.Add(tileColor, tile.transform.position);
+            //initialPosition.Add(tileColor, tile.transform.position);
         }
 
         Destroy(referenceTile);
 
-        float gridWidth = ((puzzleSize)/2) * tileSize;
-        float gridHeight = tileSize * 2;
-
         //Changes pivot point for tiles is in the center
         transform.position = new Vector3((-(gridWidth/2 + tileSize/2)), (gridHeight/2 - tileSize/2)-2, transform.position.z);
+        foreach(Transform child in transform)
+        {
+            initialPosition.Add(child.GetComponent<Renderer>().material.color, child.position);
+        }
     }
 }
