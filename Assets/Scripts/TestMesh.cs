@@ -9,9 +9,9 @@ using System.IO;
 public class TestMesh : MonoBehaviour
 {
     public int polygonNumber;
-    public Color startColor = Color.red;
-    public Color endColor = Color.blue;
-    public Vector2 imageDim = new Vector2(512, 512);
+    public Color startColor;
+    public Color endColor;
+    public Vector2 imageDim;
     public Color[] colorArray;
  
     private List<Vector2f> points;
@@ -26,21 +26,16 @@ public class TestMesh : MonoBehaviour
 
     void Start() {
         if(PlayerPrefs.GetInt("Level") == 1)
-        {
             polygonNumber = 6;
-            Debug.Log($"easy {polygonNumber}");
-        }
         else if (PlayerPrefs.GetInt("Level") == 2)
-        {
             polygonNumber = 10;
-            Debug.Log("medium");
-        }
         else
-        {
             polygonNumber = 12;
-            Debug.Log("hard");
-        }
+ 
         // Create random points
+        imageDim = new Vector2(Screen.width, Screen.width);
+        startColor = Color.red;
+        endColor = Color.blue;
         points = CreateRandomPoint();
         highX = ((imageDim.x/2)/100f);
         highY = ((imageDim.y/2)/100f);
@@ -65,7 +60,7 @@ public class TestMesh : MonoBehaviour
     private List<Vector2f> CreateRandomPoint() {
         List<Vector2f> points = new List<Vector2f>();
         for (int i = 0; i < polygonNumber; i++) {
-            points.Add(new Vector2f(Random.Range(0,512), Random.Range(0,512)));
+            points.Add(new Vector2f(Random.Range(0,imageDim.x), Random.Range(0,imageDim.y)));
         }
  
         return points;
@@ -265,24 +260,26 @@ public class TestMesh : MonoBehaviour
 
     private void DisplayEdges() {
         
-        Texture2D tx = new Texture2D(512,512, TextureFormat.ARGB32, false);
+        Texture2D tx = new Texture2D((int)imageDim.x, (int)imageDim.y, TextureFormat.ARGB32, false);
         GetComponent<SpriteRenderer>().sprite = Sprite.Create(tx, new Rect(0,0, imageDim.x, imageDim.y), (Vector2.one * 0.5f));
         transform.localPosition = new Vector3(0, -2, -2f);
+        int borderOffset = 1;
+        Color borderColor = new Color(224/255f, 224/255f, 224/255f);
  
         foreach (Edge edge in edges) {
             // if the edge doesn't have clippedEnds, if was not within the bounds, dont draw it
             if (edge.ClippedEnds == null) continue;
- 
+
             DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], tx, Color.black);
 
             // Set remaining sections of texture to white
-            for (int row = 0; row < 512; row++)
+            for (int row = 0; row < imageDim.x; row++)
             {
-                for (int column = 0; column < 512; column++)
+                for (int column = 0; column < imageDim.y; column++)
                 {
                     if (tx.GetPixel(row, column) != Color.black)
                     {
-                        if (row <= 2 || column <= 2 || row >= 509 || column >= 509)
+                        if (row <= 1 || column <= 1 || row >= (imageDim.x - borderOffset - 1) || column >= imageDim.y - borderOffset - 1)
                         {
                             tx.SetPixel(row, column, Color.black);
                         }

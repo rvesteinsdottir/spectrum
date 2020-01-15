@@ -39,3 +39,25 @@ sysinfo.txt
 Icon?
 ehthumbs.db
 Thumbs.db
+
+###
+# For XCode resource: https://stackoverflow.com/questions/49478/git-ignore-file-for-xcode-projects
+###
+
+*.swp
+*~.nib
+
+.Trashes
+
+DerivedData/
+build/
+
+*.pbxuser
+*.perspective
+*.perspectivev3
+
+*.mode1v3
+*.mode2v3
+
+*.xccheckout
+xcuserdata/
