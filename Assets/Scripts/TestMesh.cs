@@ -41,8 +41,8 @@ public class TestMesh : MonoBehaviour
         // Create random points
         imageDim = new Vector2(Screen.width - 80, Screen.width - 80);
         Debug.Log(imageDim);
-        startColor = new Color(1, 32/255f, 32/255f);
-        endColor = new Color(32/255f, 32/255f, 1);
+        startColor = HexToColor(PlayerPrefs.GetString("ColorOne", ColorToHex(Color.red)));
+        endColor = HexToColor(PlayerPrefs.GetString("ColorTwo", ColorToHex(Color.blue)));
         points = CreateRandomPoint();
         highX = ((imageDim.x/2)/100f);
         highY = ((imageDim.y/2)/100f);
@@ -418,5 +418,22 @@ public class TestMesh : MonoBehaviour
                 y0 += sy;
             }
         }
+    }
+
+
+    // CREDIT
+    string ColorToHex(Color32 color)
+    {
+        string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
+        Debug.Log(hex);
+        return hex;
+    }
+    
+    Color HexToColor(string hex)
+    {
+        byte r = byte.Parse(hex.Substring(0,2), System.Globalization.NumberStyles.HexNumber);
+        byte g = byte.Parse(hex.Substring(2,2), System.Globalization.NumberStyles.HexNumber);
+        byte b = byte.Parse(hex.Substring(4,2), System.Globalization.NumberStyles.HexNumber);
+        return new Color(r/255f, g/255f, b/255f , 1);
     }
 }

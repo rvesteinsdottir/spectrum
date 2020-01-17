@@ -25,6 +25,9 @@ public class ButtonHandler : MonoBehaviour
             PlayerPrefs.SetInt("Level", 3);
             SceneManager.LoadScene("SampleScene");
             break;
+            case "selectColor":
+            SceneManager.LoadScene("ColorPickScene");
+            break;
         }
     }
 }
