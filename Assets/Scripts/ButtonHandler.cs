@@ -8,23 +8,23 @@ using UnityEngine.UI;
 public class ButtonHandler : MonoBehaviour
 {
 
-  public void playgame() 
-  {
-    Button button = GetComponent<Button>();
-    switch (button.name)
-    {
-      case "easy":
-        PlayerPrefs.SetInt("Level", 1);
-        SceneManager.LoadScene("SampleScene");
-        break;
-      case "medium":
-        PlayerPrefs.SetInt("Level", 2);
-        SceneManager.LoadScene("SampleScene");
-        break;
-      case "hard":
-        PlayerPrefs.SetInt("Level", 3);
-        SceneManager.LoadScene("SampleScene");
-        break;
+    public void playgame() 
+    {   
+        Button button = GetComponent<Button>();
+        switch (button.name)
+        {
+            case "easy":
+            PlayerPrefs.SetInt("Level", 1);
+            SceneManager.LoadScene("SampleScene");
+            break;
+            case "medium":
+            PlayerPrefs.SetInt("Level", 2);
+            SceneManager.LoadScene("SampleScene");
+            break;
+            case "hard":
+            PlayerPrefs.SetInt("Level", 3);
+            SceneManager.LoadScene("SampleScene");
+            break;
+        }
     }
-  }
 }

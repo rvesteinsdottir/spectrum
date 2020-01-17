@@ -6,9 +6,13 @@ using UnityEngine.SceneManagement;
 
 public class ReturnHome : MonoBehaviour
 {
-  public void returnHome() 
-  {
-    SceneManager.LoadScene("OpeningScene");
+    public void returnHome() 
+    {
+        if (SceneManager.GetActiveScene().name == "WinningScene"){
+            Destroy(GameObject.Find("MeshParent"));
+        }
 
-  }
+        SceneManager.LoadScene("OpeningScene");
+
+    }
 }

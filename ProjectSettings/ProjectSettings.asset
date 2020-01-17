@@ -158,6 +158,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: game.RaisahVesteinsdottir.SpectrumV1
     Standalone: com.Company.ProductName
+    iOS: game.unity2d.ColorGradientGameV1
   buildNumber: {}
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 16

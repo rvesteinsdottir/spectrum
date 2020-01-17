@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class MeshVorPieces : MonoBehaviour
 {
@@ -76,6 +78,7 @@ public class MeshVorPieces : MonoBehaviour
         {
             Vector2 newLocation = inputPosition + touchOffset;
             draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -1f);
+
             //draggedObject.transform.position = newLocation;
         }
         else
@@ -94,7 +97,8 @@ public class MeshVorPieces : MonoBehaviour
                     touchOffset = (Vector2)hit.transform.position - inputPosition;
 
                     // Increase object size when being dragged
-                    draggedObject.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
+                    draggedObject.transform.localScale = new Vector3(1.7f, 1.7f, 1f);
+
                 }
             }
         }
@@ -142,18 +146,22 @@ public class MeshVorPieces : MonoBehaviour
                     ChangeObjectColor(selectedCollider);
 
                     Destroy(draggedObject);
-                    // Destroy(selectedCollider.gameObject);
-                //   puzzleBoard.GetComponent<VoronoiDiagram>().updateIndex = colliderIndex;
-                //   puzzleBoard.GetComponent<VoronoiDiagram>().updateNeeded = true;
                 } else 
                 {
                     draggedObject.transform.position = ((Vector3)initialPosition[draggedObjectColor]);
+                }
+
+                if (correctMatches.Count == puzzleSize)
+                {
+                    int currentScore = PlayerPrefs.GetInt("Score");
+                    PlayerPrefs.SetInt("Score", currentScore + puzzleSize);
+                    DisplayWinningScreen();
                 }
             }
         }
 
         draggingItem = false;
-        draggedObject.transform.localScale = new Vector3(1f, 1f, 1f);
+        draggedObject.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
 
     }
 
@@ -188,7 +196,7 @@ public class MeshVorPieces : MonoBehaviour
 
     private void GenerateTiles()
     {
-        GameObject referenceTile = (GameObject)Instantiate(Resources.Load("SquareTile"));
+        GameObject referenceTile = (GameObject)Instantiate(Resources.Load("RoundedTile"));
         initialPosition = new Hashtable();
         int tileSize = 1;
         float gridWidth = ((puzzleSize)/2) * tileSize;
@@ -207,7 +215,8 @@ public class MeshVorPieces : MonoBehaviour
             }
 
             tile.transform.position = new Vector3(posX, posY, -3f);
-            tile.name = "SquareTile";
+            tile.transform.localScale = new Vector3(1.5f, 1.5f, 0);
+            tile.name = "RoundedTile";
             tile.layer = LayerMask.NameToLayer("Piece");
 
             // Assign random color to tile
@@ -222,10 +231,28 @@ public class MeshVorPieces : MonoBehaviour
         Destroy(referenceTile);
 
         //Changes pivot point for tiles is in the center
-        transform.position = new Vector3((-(gridWidth/2 + tileSize/2)), (gridHeight/2 - tileSize/2)-2, transform.position.z);
-        foreach(Transform child in transform)
+        transform.position = new Vector3((-(gridWidth/2 + tileSize/2)), (gridHeight/2 - tileSize/2)-3, transform.position.z);
+
+        GameObject puzzleBank = (GameObject)Instantiate(Resources.Load("PuzzleBank2"), transform);
+        puzzleBank.GetComponent<Renderer>().material.color = new Color (1, 1, 1);
+        puzzleBank.transform.position = new Vector3(0f, 2.52f, 0);
+
+        puzzleBank.name = "PuzzleBank";
+        puzzleBank.layer = LayerMask.NameToLayer("Board");
+        puzzleBank.transform.localScale = new Vector3((1f + (0.5f * puzzleSize/2)), 3.5f, 0);
+
+
+        for (int j = 0; j < transform.childCount; j++)
         {
+            Transform child = transform.GetChild(j); 
             initialPosition.Add(child.GetComponent<Renderer>().material.color, child.position);
         }
+
+    }
+
+    private void DisplayWinningScreen()
+    {
+        DontDestroyOnLoad(GameObject.Find("MeshParent"));
+        SceneManager.LoadScene("WinningScene");
     }
 }

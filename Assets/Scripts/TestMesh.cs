@@ -15,6 +15,7 @@ public class TestMesh : MonoBehaviour
     public Color[] colorArray;
  
     private List<Vector2f> points;
+    private List<Vector2> adjustedPoints;
     private Dictionary<Vector2f, Site> sites;
     private List<Edge> edges;
     private float highX;
@@ -23,24 +24,35 @@ public class TestMesh : MonoBehaviour
     private float lowY;
     private GameObject meshParent;
     public PolygonCollider2D[] allColliders;
+    private float lowestSeenX;
+    private float lowestSeenY;
+    private float highestSeenX;
+    private float highestSeenY;
+
 
     void Start() {
         if(PlayerPrefs.GetInt("Level") == 1)
             polygonNumber = 6;
         else if (PlayerPrefs.GetInt("Level") == 2)
-            polygonNumber = 10;
+            polygonNumber = 8;
         else
-            polygonNumber = 12;
+            polygonNumber = 10;
  
         // Create random points
-        imageDim = new Vector2(Screen.width, Screen.width);
-        startColor = Color.red;
-        endColor = Color.blue;
+        imageDim = new Vector2(Screen.width - 80, Screen.width - 80);
+        Debug.Log(imageDim);
+        startColor = new Color(1, 32/255f, 32/255f);
+        endColor = new Color(32/255f, 32/255f, 1);
         points = CreateRandomPoint();
         highX = ((imageDim.x/2)/100f);
         highY = ((imageDim.y/2)/100f);
         lowX = -highX;
         lowY = -highY;
+        lowestSeenX = ((imageDim.x/2)/100f);
+        lowestSeenY = ((imageDim.y/2)/100f);
+        highestSeenX = 0;
+        highestSeenY = 0;
+
         
         meshParent = GameObject.Find("MeshParent");
         colorArray = new Color[polygonNumber];
@@ -70,22 +82,36 @@ public class TestMesh : MonoBehaviour
         Color tileWidth = ((endColor - startColor)/imageDim.x);
         int index = 0;
         allColliders = new PolygonCollider2D[polygonNumber];
-        
-        foreach(KeyValuePair<Vector2f, Site> entry in sites)
+        adjustedPoints = new List<Vector2>();
+
+        Vector2f[] siteKeys = sites.Keys.ToArray();
+
+        for (int j = 0; j < siteKeys.Length; j++)
         {
-            float sitePosX = ((entry.Value.x - imageDim.x/2)/100f);
-            float sitePosY = ((entry.Value.y - imageDim.x/2)/100f);
+            Vector2f entryKey = siteKeys[j];
+
+            Site entryValue = sites[entryKey];
+
+            float sitePosX = ((entryValue.x - imageDim.x/2)/100f);
+            float sitePosY = ((entryValue.y - imageDim.y/2)/100f);
+            adjustedPoints.Add(new Vector2(sitePosX, sitePosY));
+        }
+
+        for (int i = 0; i < siteKeys.Length; i++)
+        {
+            Vector2f entryKey = siteKeys[i];
+            Site entryValue = sites[entryKey];
             
             // Generate mesh vertices from Voronoi region edges
-            List<Vector2> allVertices = GenerateVertices(entry.Value);
+            List<Vector2> allVertices = GenerateVertices(entryValue);
 
             // Remove duplicates from vertices list
             List<Vector2> uniqueVerticesList = allVertices.Distinct().ToList();
 
             // Sort list in counter clockwise order for triangulation
-            uniqueVerticesList.Sort((v, w) => compare(v, w, new Vector2(sitePosX, sitePosY)));
+            uniqueVerticesList.Sort((v, w) => compare(v, w, adjustedPoints[i]));
 
-            Color tileColor = (startColor + (tileWidth * entry.Value.y));
+            Color tileColor = (startColor + (tileWidth * entryValue.y));
             //Color tileColor = Color.white;
             colorArray[index] = tileColor;
             Vector2[] uniqueVerticesArray = uniqueVerticesList.ToArray();
@@ -181,34 +207,33 @@ public class TestMesh : MonoBehaviour
 
             if (adjustedLeft.x == lowX || adjustedRight.x == lowX)
                 containsLowX = true;
-
             if (adjustedLeft.y == lowY || adjustedRight.y == lowY)
                 containsLowY = true;
-
             if (adjustedLeft.x == highX || adjustedRight.x == highX)
                 containsHighX = true;
-            
             if (adjustedLeft.y == highY || adjustedRight.y == highY)
                 containsHighY = true;
         }
 
         // Add corners to vertices list if needed
-        if (containsLowX && containsLowY) 
+        if(containsLowX && containsLowY && isOuterCentroid("lowerLeft", center))
             vertices2D.Add(new Vector2(lowX, lowY));
-        else if (containsHighX && containsHighY) 
+        else if(containsHighX && containsHighY && isOuterCentroid("upperRight", center))
             vertices2D.Add(new Vector2(highX, highY));
-        else if (containsLowX && containsHighY) 
+        else if (containsLowX && containsHighY && isOuterCentroid("upperLeft", center)) 
             vertices2D.Add(new Vector2(lowX, highY));
-        else if (containsHighX && containsLowY) 
+        else if (containsHighX && containsLowY && isOuterCentroid("lowerRight", center)) 
             vertices2D.Add(new Vector2(highX, lowY));
         else if (containsHighY && containsLowY)
         {
-            if (vertices2D[0].x > 0)
+            // cannot be ANY vertex, must be the lowest or highest
+            //if (vertices2D[0].x > 0 && isOuterCentroid("upperRight", center) && isOuterCentroid("lowerRight", center))
+            if (isOuterCentroid("upperRight", center) && isOuterCentroid("lowerRight", center))
             {
                 vertices2D.Add(new Vector2(highX, highY));
                 vertices2D.Add(new Vector2(highX, lowY));
             }
-            else
+            else if (isOuterCentroid("lowerLeft", center) && isOuterCentroid("upperLeft", center))
             {
                 vertices2D.Add(new Vector2(lowX, highY));
                 vertices2D.Add(new Vector2(lowX, lowY));
@@ -216,12 +241,13 @@ public class TestMesh : MonoBehaviour
         }
         else if (containsHighX && containsLowX)
         {
-            if (vertices2D[0].y > 0)
+            // cannot be ANY vertex, must be the lowest or highest
+            if (isOuterCentroid("upperRight", center) && isOuterCentroid("upperLeft", center))
             {
                 vertices2D.Add(new Vector2(lowX, highY));
                 vertices2D.Add(new Vector2(highX, highY));
             }
-            else
+            else if (isOuterCentroid("lowerRight", center) && isOuterCentroid("lowerLeft", center))
             {
                 vertices2D.Add(new Vector2(lowX, lowY));
                 vertices2D.Add(new Vector2(highX, lowY));
@@ -230,6 +256,48 @@ public class TestMesh : MonoBehaviour
 
         return vertices2D;
     }
+
+    bool isOuterCentroid(string place, Vector2 currentCentroid)
+    {
+        bool currentIsOutermost = true; 
+        if (place == "lowerLeft")
+        {
+            for (int i = 0; i < adjustedPoints.Count; i++)
+            {
+                if ((adjustedPoints[i].x < currentCentroid.x) && (adjustedPoints[i].y < currentCentroid.y))
+                    currentIsOutermost = false;
+            }
+        }
+        else if (place == "upperRight")
+        {
+            for (int i = 0; i < adjustedPoints.Count; i++)
+            {
+                if((adjustedPoints[i].x > currentCentroid.x) && (adjustedPoints[i].y > currentCentroid.y))
+                    currentIsOutermost = false;
+            }
+        }
+        else if (place == "lowerRight")
+        {
+
+            for (int i = 0; i < adjustedPoints.Count; i++)
+            {
+                if((adjustedPoints[i].x > currentCentroid.x) && (adjustedPoints[i].y < currentCentroid.y))
+                    currentIsOutermost = false;
+            }
+        }
+        else if (place == "upperLeft")
+        {
+
+            for (int i = 0; i < adjustedPoints.Count; i++)
+            {
+                if((adjustedPoints[i].x < currentCentroid.x) && (adjustedPoints[i].y > currentCentroid.y))
+                    currentIsOutermost = false;
+            }
+        }
+
+        return currentIsOutermost;
+    }
+
 
     // Method adapted from Stack OverFlow answer from ciamej on August 8, 2011 (https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order)
     int compare (Vector2 a, Vector2 b, Vector2 center)
@@ -262,26 +330,30 @@ public class TestMesh : MonoBehaviour
         
         Texture2D tx = new Texture2D((int)imageDim.x, (int)imageDim.y, TextureFormat.ARGB32, false);
         GetComponent<SpriteRenderer>().sprite = Sprite.Create(tx, new Rect(0,0, imageDim.x, imageDim.y), (Vector2.one * 0.5f));
-        transform.localPosition = new Vector3(0, -2, -2f);
-        int borderOffset = 1;
-        Color borderColor = new Color(224/255f, 224/255f, 224/255f);
- 
-        foreach (Edge edge in edges) {
+        transform.localPosition = new Vector3(0, -2.2f, -2f);
+        int borderOffset = 5;
+        Color borderColor = new Color (179/255f, 189/255f, 201/255f);
+
+        for (int i = 0; i < edges.Count; i++)
+        {
+            Edge edge = edges[i];
+
             // if the edge doesn't have clippedEnds, if was not within the bounds, dont draw it
             if (edge.ClippedEnds == null) continue;
 
-            DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], tx, Color.black);
+            DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], tx, borderColor);
 
             // Set remaining sections of texture to white
             for (int row = 0; row < imageDim.x; row++)
             {
                 for (int column = 0; column < imageDim.y; column++)
                 {
-                    if (tx.GetPixel(row, column) != Color.black)
+                    if (tx.GetPixel(row, column) != borderColor)
                     {
-                        if (row <= 1 || column <= 1 || row >= (imageDim.x - borderOffset - 1) || column >= imageDim.y - borderOffset - 1)
+                        if (row <= borderOffset || column <= borderOffset || row >= (imageDim.x - borderOffset - 1) || column >= imageDim.y - borderOffset - 1)
                         {
-                            tx.SetPixel(row, column, Color.black);
+                            Color pixelColor = GetClosestCentroid(new Vector2(row, column));
+                            tx.SetPixel(row, column, pixelColor);
                         }
                         else
                         {
@@ -299,6 +371,23 @@ public class TestMesh : MonoBehaviour
 
         this.GetComponent<Renderer>().material.mainTexture = tx;
     }
+
+    Color GetClosestCentroid(Vector2 pixelPos)
+    {
+        float smallestDist = float.MaxValue;
+        int index = 0;
+        Vector2 adjustedPos = new Vector2(((pixelPos.x - imageDim.x/2)/100f), ((pixelPos.y - imageDim.y/2)/100f));
+
+        for (int i = 0; i < adjustedPoints.Count; i++)
+        {
+            if (Vector2.Distance(adjustedPos, adjustedPoints[i]) < smallestDist)
+            {
+            smallestDist = Vector2.Distance(adjustedPos, adjustedPoints[i]);
+            index = i;
+            }
+        }
+        return colorArray[index];
+    }
  
     // Bresenham line algorithm
     private void DrawLine(Vector2f p0, Vector2f p1, Texture2D tx, Color c, int offset = 0) {
@@ -315,8 +404,8 @@ public class TestMesh : MonoBehaviour
        
         while (true) {
             tx.SetPixel(x0+offset,y0+offset,c);
-            tx.SetPixel(x0+offset+1,y0+offset,c);
-            tx.SetPixel(x0+offset-1,y0+offset,c);
+            tx.SetPixel(x0+offset+1,y0+offset, c);
+            tx.SetPixel(x0+offset-1,y0+offset, c);
            
             if (x0 == x1 && y0 == y1) break;
             int e2 = 2*err;
