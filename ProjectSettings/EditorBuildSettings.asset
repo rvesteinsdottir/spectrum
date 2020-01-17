@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/WinningScene.unity
     guid: 61ccce9e1ac0c417f8a1fc1367f6ef17
+  - enabled: 1
+    path: Assets/Scenes/ColorPickScene.unity
+    guid: 04c90bd0abe6348e6aadac57a94a59fd
   m_configObjects: {}
