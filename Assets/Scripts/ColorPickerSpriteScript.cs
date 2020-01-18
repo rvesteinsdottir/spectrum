@@ -15,6 +15,11 @@ public class ColorPickerSpriteScript : MonoBehaviour
     private Material colorTwoMat;
     private GameObject currentColor;
     private GameObject border;
+    // public float spriteBlinkingTimer = 0.0f;
+    // public float spriteBlinkingTotalTimer = 0.0f;
+    // public float spriteBlinkingTotalDuration = 3.0f;
+    // public bool startBlinking = true;
+    // float timer = 0.0f;
 
     void Start()
     {
@@ -25,19 +30,24 @@ public class ColorPickerSpriteScript : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
             OnMouseDown();
+
+        // if (startBlinking == true)
+        // {
+        //     StartBlinkingEffect();
+        // }
     }
 
     private void SetDisplay()
     {
         // Set color wheel
         go = (GameObject)Instantiate(ColorPickedPrefab, transform.position, Quaternion.identity);
-        go.transform.position += new Vector3(0,0,0);
-        go.transform.localScale = Vector3.one * 3.3f;
+        go.transform.position += new Vector3(0,-2,0);
+        go.transform.localScale = Vector3.one * 4f;
         go.transform.LookAt(Camera.main.transform);
         CP = go.GetComponent<ColorPickerTriangle>();
 
         // Display first color
-        colorOneGo = (GameObject)Instantiate(RoundedTile, new Vector3( -1f, -3, 0), Quaternion.identity);
+        colorOneGo = (GameObject)Instantiate(RoundedTile, new Vector3( -1.25f, 1.5f, 0), Quaternion.identity);
         colorOneGo.transform.LookAt(Camera.main.transform);
         colorOneGo.transform.localScale = new Vector3 (3,2,1);
         colorOneMat = colorOneGo.GetComponent<SpriteRenderer>().material;
@@ -47,7 +57,7 @@ public class ColorPickerSpriteScript : MonoBehaviour
 
 
         // Display second color
-        colorTwoGo = (GameObject)Instantiate(RoundedTile, new Vector3( 1f, -3, 0), Quaternion.identity);
+        colorTwoGo = (GameObject)Instantiate(RoundedTile, new Vector3( 1.25f, 1.5f, 0), Quaternion.identity);
         colorTwoGo.transform.LookAt(Camera.main.transform);
         colorTwoGo.transform.localScale = new Vector3 (3,2,1);
         colorTwoMat = colorTwoGo.GetComponent<SpriteRenderer>().material;
@@ -61,11 +71,29 @@ public class ColorPickerSpriteScript : MonoBehaviour
 
         border = (GameObject)Instantiate(RoundedTile, transform.position, Quaternion.identity);
         border.transform.position = currentColor.transform.position;
-        border.transform.localScale = new Vector3 (3.2f, 2.2f, 1);
-        border.GetComponent<SpriteRenderer>().material.color = Color.white;
+        border.transform.localScale = new Vector3 (3.1f, 2.1f, 1);
+        border.GetComponent<SpriteRenderer>().material.color = new Color(1, 1, 1, 0.75f);
         border.GetComponent<SpriteRenderer>().sortingLayerName = "Background";
         border.layer = 8;
     }
+
+    // // From stack overflow (https://answers.unity.com/questions/1134985/sprite-blinking-effect-when-player-hit.html)
+    // private void StartBlinkingEffect()
+    // {
+    //     timer += Time.deltaTime;
+
+    //     if (Mathf.Round(timer * 1000) % 200f == 0)
+    //     {
+    //         Debug.Log(timer);
+    //         if (border.gameObject.GetComponent<SpriteRenderer> ().enabled == true) {
+    //             border.gameObject.GetComponent<SpriteRenderer> ().enabled = false; 
+    //         } 
+    //         else 
+    //         {
+    //             border.gameObject.GetComponent<SpriteRenderer> ().enabled = true;   
+    //         }
+    //     }
+    // }
 
     void OnMouseDown()
     {

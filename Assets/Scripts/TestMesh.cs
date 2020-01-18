@@ -39,7 +39,7 @@ public class TestMesh : MonoBehaviour
             polygonNumber = 10;
  
         // Create random points
-        imageDim = new Vector2(Screen.width - 80, Screen.width - 80);
+        imageDim = new Vector2(Screen.width - 75, Screen.width - 75);
         Debug.Log(imageDim);
         startColor = HexToColor(PlayerPrefs.GetString("ColorOne", ColorToHex(Color.red)));
         endColor = HexToColor(PlayerPrefs.GetString("ColorTwo", ColorToHex(Color.blue)));
