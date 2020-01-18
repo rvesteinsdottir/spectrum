@@ -1,0 +1,438 @@
+fileFormatVersion: 2
+guid: a5f8afb1413db4060b0f223b6de7fd91
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: GameIcons_0
+    21300002: GameIcons_1
+    21300004: GameIcons_2
+    21300006: GameIcons_3
+    21300008: GameIcons_4
+    21300010: GameIcons_5
+    21300012: GameIcons_6
+    21300014: GameIcons_7
+    21300016: GameIcons_8
+    21300018: GameIcons_9
+    21300020: GameIcons_10
+    21300022: GameIcons_11
+    21300024: GameIcons_12
+    21300026: GameIcons_13
+    21300028: GameIcons_14
+    21300030: GameIcons_15
+    21300032: GameIcons_16
+    21300034: GameIcons_17
+    21300036: GameIcons_18
+    21300038: GameIcons_19
+    21300040: GameIcons_20
+    21300042: GameIcons_21
+    21300044: GameIcons_22
+    21300046: GameIcons_23
+    21300048: GameIcons_24
+    21300050: GameIcons_25
+    21300052: GameIcons_26
+    21300054: GameIcons_27
+    21300056: GameIcons_28
+    21300058: GameIcons_29
+    21300060: GameIcons_30
+    21300062: GameIcons_31
+    21300064: GameIcons_32
+    21300066: GameIcons_33
+    21300068: GameIcons_34
+    21300070: GameIcons_35
+    21300072: GameIcons_36
+    21300074: GameIcons_37
+    21300076: GameIcons_38
+    21300078: GameIcons_39
+    21300080: GameIcons_40
+    21300082: GameIcons_41
+    21300084: GameIcons_42
+    21300086: GameIcons_43
+    21300088: GameIcons_44
+    21300090: GameIcons_45
+    21300092: GameIcons_46
+    21300094: GameIcons_47
+    21300096: GameIcons_48
+    21300098: GameIcons_49
+    21300100: GameIcons_50
+    21300102: GameIcons_51
+    21300104: GameIcons_52
+    21300106: GameIcons_53
+    21300108: GameIcons_54
+    21300110: GameIcons_55
+    21300112: GameIcons_56
+    21300114: GameIcons_57
+    21300116: GameIcons_58
+    21300118: GameIcons_59
+    21300120: GameIcons_60
+    21300122: GameIcons_61
+    21300124: GameIcons_62
+    21300126: GameIcons_63
+    21300128: GameIcons_64
+    21300130: GameIcons_65
+    21300132: GameIcons_66
+    21300134: GameIcons_67
+    21300136: GameIcons_68
+    21300138: GameIcons_69
+    21300140: GameIcons_70
+    21300142: GameIcons_71
+    21300144: GameIcons_72
+    21300146: GameIcons_73
+    21300148: GameIcons_74
+    21300150: GameIcons_75
+    21300152: GameIcons_76
+    21300154: GameIcons_77
+    21300156: GameIcons_78
+    21300158: GameIcons_79
+    21300160: GameIcons_80
+    21300162: GameIcons_81
+    21300164: GameIcons_82
+    21300166: GameIcons_83
+    21300168: GameIcons_84
+    21300170: GameIcons_85
+    21300172: GameIcons_86
+    21300174: GameIcons_87
+    21300176: GameIcons_88
+    21300178: GameIcons_89
+    21300180: GameIcons_90
+    21300182: GameIcons_91
+    21300184: GameIcons_92
+    21300186: GameIcons_93
+    21300188: GameIcons_94
+    21300190: GameIcons_95
+    21300192: GameIcons_96
+    21300194: GameIcons_97
+    21300196: GameIcons_98
+    21300198: GameIcons_99
+    21300200: GameIcons_100
+    21300202: GameIcons_101
+    21300204: GameIcons_102
+    21300206: GameIcons_103
+    21300208: GameIcons_104
+    21300210: GameIcons_105
+    21300212: GameIcons_106
+    21300214: GameIcons_107
+    21300216: GameIcons_108
+    21300218: GameIcons_109
+    21300220: GameIcons_110
+    21300222: GameIcons_111
+    21300224: GameIcons_112
+    21300226: GameIcons_113
+    21300228: GameIcons_114
+    21300230: GameIcons_115
+    21300232: GameIcons_116
+    21300234: GameIcons_117
+    21300236: GameIcons_118
+    21300238: GameIcons_119
+    21300240: GameIcons_120
+    21300242: GameIcons_121
+    21300244: GameIcons_122
+    21300246: GameIcons_123
+    21300248: GameIcons_124
+    21300250: GameIcons_125
+    21300252: GameIcons_126
+    21300254: GameIcons_127
+    21300256: GameIcons_128
+    21300258: GameIcons_129
+    21300260: GameIcons_130
+    21300262: GameIcons_131
+    21300264: GameIcons_132
+    21300266: GameIcons_133
+    21300268: GameIcons_134
+    21300270: GameIcons_135
+    21300272: GameIcons_136
+    21300274: GameIcons_137
+    21300276: GameIcons_138
+    21300278: GameIcons_139
+    21300280: GameIcons_140
+    21300282: GameIcons_141
+    21300284: GameIcons_142
+    21300286: GameIcons_143
+    21300288: GameIcons_144
+    21300290: GameIcons_145
+    21300292: GameIcons_146
+    21300294: GameIcons_147
+    21300296: GameIcons_148
+    21300298: GameIcons_149
+    21300300: GameIcons_150
+    21300302: GameIcons_151
+    21300304: GameIcons_152
+    21300306: GameIcons_153
+    21300308: GameIcons_154
+    21300310: GameIcons_155
+    21300312: GameIcons_156
+  externalObjects: {}
+  serializedVersion: 9
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: -1
+    aniso: -1
+    mipBias: -100
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 856, y: 516, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - serializedVersion: 2
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  - serializedVersion: 2
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  - serializedVersion: 2
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  - serializedVersion: 2
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: GameIcons_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 500
+        width: 242
+        height: 280
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 36, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f0a3162b75a043feab7c7f28a91b2c7
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameIcons_1
+      rect:
+        serializedVersion: 2
+        x: 154
+        y: 495
+        width: 242
+        height: 280
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91d47d8e672f5477dad2da37cfefe54b
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameIcons_2
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 500
+        width: 242
+        height: 280
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 68ceb5a0a3076448aaef51ad86216fd9
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameIcons_3
+      rect:
+        serializedVersion: 2
+        x: 854
+        y: 517
+        width: 242
+        height: 263
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 33, y: 0, z: 0, w: 49}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1858236f04c5644799e86d7cb16bc565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameIcons_4
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 220
+        width: 242
+        height: 280
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1153756fd0a8540048d3941f9e94381b
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameIcons_5
+      rect:
+        serializedVersion: 2
+        x: 242
+        y: 220
+        width: 242
+        height: 280
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 54d32999303b04898be5108b0c3feab5
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameIcons_6
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 220
+        width: 242
+        height: 280
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c95603e28f236458984f155be7d9e27c
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: GameIcons_7
+      rect:
+        serializedVersion: 2
+        x: 852
+        y: 261
+        width: 242
+        height: 239
+      alignment: 3
+      pivot: {x: 1, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4106357d02d5e4f16a2c0bc27c843594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 71402425414214e2981b63c26d23a093
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

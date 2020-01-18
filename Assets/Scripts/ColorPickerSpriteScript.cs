@@ -5,7 +5,7 @@ using UnityEngine;
 public class ColorPickerSpriteScript : MonoBehaviour
 {
     public GameObject ColorPickedPrefab;
-    public GameObject RoundedTile;
+    public GameObject ColorPickTile;
     private ColorPickerTriangle CP;
     private bool isPaint = false;
     private GameObject go;
@@ -15,11 +15,7 @@ public class ColorPickerSpriteScript : MonoBehaviour
     private Material colorTwoMat;
     private GameObject currentColor;
     private GameObject border;
-    // public float spriteBlinkingTimer = 0.0f;
-    // public float spriteBlinkingTotalTimer = 0.0f;
-    // public float spriteBlinkingTotalDuration = 3.0f;
-    // public bool startBlinking = true;
-    // float timer = 0.0f;
+
 
     void Start()
     {
@@ -30,11 +26,6 @@ public class ColorPickerSpriteScript : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
             OnMouseDown();
-
-        // if (startBlinking == true)
-        // {
-        //     StartBlinkingEffect();
-        // }
     }
 
     private void SetDisplay()
@@ -47,9 +38,9 @@ public class ColorPickerSpriteScript : MonoBehaviour
         CP = go.GetComponent<ColorPickerTriangle>();
 
         // Display first color
-        colorOneGo = (GameObject)Instantiate(RoundedTile, new Vector3( -1.25f, 1.5f, 0), Quaternion.identity);
+        colorOneGo = (GameObject)Instantiate(ColorPickTile, new Vector3( -1.25f, 1.5f, 0), Quaternion.identity);
         colorOneGo.transform.LookAt(Camera.main.transform);
-        colorOneGo.transform.localScale = new Vector3 (3,2,1);
+        colorOneGo.transform.localScale = new Vector3 (0.75f,0.75f,1);
         colorOneMat = colorOneGo.GetComponent<SpriteRenderer>().material;
         colorOneMat.color = HexToColor(PlayerPrefs.GetString("ColorOne", ColorToHex(Color.red)));
         colorOneGo.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
@@ -57,9 +48,9 @@ public class ColorPickerSpriteScript : MonoBehaviour
 
 
         // Display second color
-        colorTwoGo = (GameObject)Instantiate(RoundedTile, new Vector3( 1.25f, 1.5f, 0), Quaternion.identity);
+        colorTwoGo = (GameObject)Instantiate(ColorPickTile, new Vector3( 1.25f, 1.5f, 0), Quaternion.identity);
         colorTwoGo.transform.LookAt(Camera.main.transform);
-        colorTwoGo.transform.localScale = new Vector3 (3,2,1);
+        colorTwoGo.transform.localScale = new Vector3 (0.75f,0.75f,1);
         colorTwoMat = colorTwoGo.GetComponent<SpriteRenderer>().material;
         colorTwoMat.color = HexToColor(PlayerPrefs.GetString("ColorTwo", ColorToHex(Color.blue)));
         colorTwoGo.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
@@ -69,31 +60,13 @@ public class ColorPickerSpriteScript : MonoBehaviour
         // Display border
         currentColor = colorOneGo;
 
-        border = (GameObject)Instantiate(RoundedTile, transform.position, Quaternion.identity);
+        border = (GameObject)Instantiate(ColorPickTile, transform.position, Quaternion.identity);
         border.transform.position = currentColor.transform.position;
-        border.transform.localScale = new Vector3 (3.1f, 2.1f, 1);
+        border.transform.localScale = new Vector3 (0.8f, 0.8f, 1);
         border.GetComponent<SpriteRenderer>().material.color = new Color(1, 1, 1, 0.75f);
         border.GetComponent<SpriteRenderer>().sortingLayerName = "Background";
         border.layer = 8;
     }
-
-    // // From stack overflow (https://answers.unity.com/questions/1134985/sprite-blinking-effect-when-player-hit.html)
-    // private void StartBlinkingEffect()
-    // {
-    //     timer += Time.deltaTime;
-
-    //     if (Mathf.Round(timer * 1000) % 200f == 0)
-    //     {
-    //         Debug.Log(timer);
-    //         if (border.gameObject.GetComponent<SpriteRenderer> ().enabled == true) {
-    //             border.gameObject.GetComponent<SpriteRenderer> ().enabled = false; 
-    //         } 
-    //         else 
-    //         {
-    //             border.gameObject.GetComponent<SpriteRenderer> ().enabled = true;   
-    //         }
-    //     }
-    // }
 
     void OnMouseDown()
     {
@@ -161,11 +134,17 @@ public class ColorPickerSpriteScript : MonoBehaviour
         isPaint = false;
     }
 
+    public void RefreshGame()
+    {
+        colorOneGo.GetComponent<SpriteRenderer>().material.color = HexToColor(PlayerPrefs.GetString("ColorOne"));
+        colorTwoGo.GetComponent<SpriteRenderer>().material.color = HexToColor(PlayerPrefs.GetString("ColorTwo"));
+    }
+
+
     //CREDIT
     string ColorToHex(Color32 color)
     {
         string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
-        Debug.Log(hex);
         return hex;
     }
     
