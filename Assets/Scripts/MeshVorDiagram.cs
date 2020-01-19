@@ -184,26 +184,12 @@ public class MeshVorDiagram : MonoBehaviour
     {
         Vector2 center = new Vector2(AdjustedPosition("x", newSite.x), AdjustedPosition("y", newSite.y));
         List<Edge> siteEdges = newSite.Edges;
-        List<Vector2> vertices2D = new List<Vector2>();
         bool containsLowX = false;
         bool containsLowY = false;
         bool containsHighX = false;
         bool containsHighY = false;
 
-        // Create an array of all vertices of each edge
-        for (int edgeIndex = 0; edgeIndex < siteEdges.Count; edgeIndex++)
-        {
-            if (siteEdges[edgeIndex].ClippedEnds == null) continue;
-            
-            Vector2 leftVertex = new Vector2(siteEdges[edgeIndex].ClippedEnds[LR.LEFT].x, siteEdges[edgeIndex].ClippedEnds[LR.LEFT].y);
-            Vector2 adjustedLeft = new Vector2(AdjustedPosition("x", leftVertex.x), AdjustedPosition("y", leftVertex.y));
-
-            Vector2 rightVertex = new Vector2(siteEdges[edgeIndex].ClippedEnds[LR.RIGHT].x, siteEdges[edgeIndex].ClippedEnds[LR.RIGHT].y);
-            Vector2 adjustedRight = new Vector2(AdjustedPosition("x", rightVertex.x), AdjustedPosition("y", rightVertex.y));
-            
-            vertices2D.Add(new Vector2(adjustedLeft.x, adjustedLeft.y));
-            vertices2D.Add(new Vector2(adjustedRight.x, adjustedRight.y));
-        }
+        List<Vector2> vertices2D = GenerateVerticesList(siteEdges);
 
         // Check to see if any corners need to be added to polygon
         for (int vertexIndex = 0; vertexIndex < vertices2D.Count; vertexIndex++)
@@ -257,6 +243,27 @@ public class MeshVorDiagram : MonoBehaviour
         return vertices2D;
     }
 
+    List <Vector2> GenerateVerticesList(List<Edge> siteEdges)
+    {
+        List<Vector2> vertices = new List<Vector2>();
+
+        for (int edgeIndex = 0; edgeIndex < siteEdges.Count; edgeIndex++)
+        {
+            if (siteEdges[edgeIndex].ClippedEnds == null) continue;
+            
+            Vector2 leftVertex = new Vector2(siteEdges[edgeIndex].ClippedEnds[LR.LEFT].x, siteEdges[edgeIndex].ClippedEnds[LR.LEFT].y);
+            Vector2 adjustedLeft = new Vector2(AdjustedPosition("x", leftVertex.x), AdjustedPosition("y", leftVertex.y));
+
+            Vector2 rightVertex = new Vector2(siteEdges[edgeIndex].ClippedEnds[LR.RIGHT].x, siteEdges[edgeIndex].ClippedEnds[LR.RIGHT].y);
+            Vector2 adjustedRight = new Vector2(AdjustedPosition("x", rightVertex.x), AdjustedPosition("y", rightVertex.y));
+            
+            vertices.Add(new Vector2(adjustedLeft.x, adjustedLeft.y));
+            vertices.Add(new Vector2(adjustedRight.x, adjustedRight.y));
+        }
+
+        return vertices;
+    }
+
     bool isOuterCentroid(string place, Vector2 currentCentroid)
     {
         bool currentIsOutermost = true; 
@@ -298,8 +305,7 @@ public class MeshVorDiagram : MonoBehaviour
         return currentIsOutermost;
     }
 
-
-    // Method adapted from Stack OverFlow answer from ciamej on August 8, 2011 (https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order)
+    // Method from Stack Overflow answer from ciamej on August 8, 2011 (https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order)
     int compare (Vector2 a, Vector2 b, Vector2 center)
     {
         if (a.x - center.x >= 0 && b.x - center.x < 0)
@@ -311,65 +317,54 @@ public class MeshVorDiagram : MonoBehaviour
                 return a.y > b.y ? 1 : -1;
             return b.y > a.y ? 1 : -1;
         }
-
-        // compute the cross product of vectors (center -> a) x (center -> b)
         float det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
         if (det < 0)
             return 1;
         if (det > 0)
             return -1;
 
-        // points a and b are on the same line from the center
-        // check which point is closer to the center
         float d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
         float d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
         return d1 > d2 ? 1 : -1;
     }
 
     private void DisplayEdges() {
-        
-        Texture2D tx = new Texture2D((int)imageDim.x, (int)imageDim.y, TextureFormat.ARGB32, false);
-        GetComponent<SpriteRenderer>().sprite = Sprite.Create(tx, new Rect(0,0, imageDim.x, imageDim.y), (Vector2.one * 0.5f));
+        Texture2D diagramTexture = new Texture2D((int)imageDim.x, (int)imageDim.y, TextureFormat.ARGB32, false);
+        GetComponent<SpriteRenderer>().sprite = Sprite.Create(diagramTexture, new Rect(0, 0, imageDim.x, imageDim.y), (Vector2.one * 0.5f));
         transform.localPosition = new Vector3(0, -2.2f, -2f);
         int borderOffset = 5;
         Color borderColor = new Color (179/255f, 189/255f, 201/255f);
 
-        for (int i = 0; i < edges.Count; i++)
+        for (int edgeIndex = 0; edgeIndex < edges.Count; edgeIndex++)
         {
-            Edge edge = edges[i];
+            Edge edge = edges[edgeIndex];
 
-            // if the edge doesn't have clippedEnds, if was not within the bounds, dont draw it
             if (edge.ClippedEnds == null) continue;
 
-            DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], tx, borderColor);
+            DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], diagramTexture, borderColor);
 
             // Set remaining sections of texture to white
             for (int row = 0; row < imageDim.x; row++)
             {
                 for (int column = 0; column < imageDim.y; column++)
                 {
-                    if (tx.GetPixel(row, column) != borderColor)
+                    if (diagramTexture.GetPixel(row, column) != borderColor)
                     {
                         if (row <= borderOffset || column <= borderOffset || row >= (imageDim.x - borderOffset - 1) || column >= imageDim.y - borderOffset - 1)
-                        {
-                            Color pixelColor = GetClosestCentroid(new Vector2(row, column));
-                            tx.SetPixel(row, column, pixelColor);
-                        }
+                            diagramTexture.SetPixel(row, column, GetClosestCentroid(new Vector2(row, column)));
                         else
-                        {
-                            tx.SetPixel(row, column, new Color (1,1,1,0));
-                        }
+                            diagramTexture.SetPixel(row, column, new Color (1,1,1,0));
                     }
                 }
             }
         }
 
-        tx.filterMode = FilterMode.Point;
-        tx.Apply();
+        diagramTexture.filterMode = FilterMode.Point;
+        diagramTexture.Apply();
         Material newMaterial = new Material(Shader.Find("Unlit/Texture"));
-        newMaterial.mainTexture = tx;
+        newMaterial.mainTexture = diagramTexture;
 
-        this.GetComponent<Renderer>().material.mainTexture = tx;
+        this.GetComponent<Renderer>().material.mainTexture = diagramTexture;
     }
 
     Color GetClosestCentroid(Vector2 pixelPos)
@@ -397,6 +392,7 @@ public class MeshVorDiagram : MonoBehaviour
             return ((currentValue - imageDim.y/2)/100f);
     }
  
+    // DrawLine method from csDelunay library creator PouletFrit on May 26, 2014 via Unity Forum (https://forum.unity.com/threads/delaunay-voronoi-diagram-library-for-unity.248962/)
     // Bresenham line algorithm
     private void DrawLine(Vector2f p0, Vector2f p1, Texture2D tx, Color c, int offset = 0) {
         int x0 = (int)p0.x;
@@ -428,8 +424,7 @@ public class MeshVorDiagram : MonoBehaviour
         }
     }
 
-
-    // CREDIT
+    // ColorToHex and HexToColor methods adapted from method published by Grish_tad on Unity Forum on December 29, 2017 (https://answers.unity.com/questions/1447929/how-to-save-color.html)
     string ColorToHex(Color32 color)
     {
         string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");

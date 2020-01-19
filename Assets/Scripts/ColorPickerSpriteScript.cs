@@ -140,7 +140,7 @@ public class ColorPickerSpriteScript : MonoBehaviour
         colorTwoGo.GetComponent<SpriteRenderer>().material.color = HexToColor(PlayerPrefs.GetString("ColorTwo"));
     }
 
-    //ColorToHex and HexToColor methods adapted from method published by Grish_tad on Unity Forum on December 29, 2017 (https://answers.unity.com/questions/1447929/how-to-save-color.html)
+    // ColorToHex and HexToColor methods adapted from method published by Grish_tad on Unity Forum on December 29, 2017 (https://answers.unity.com/questions/1447929/how-to-save-color.html)
     string ColorToHex(Color32 color)
     {
         string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
