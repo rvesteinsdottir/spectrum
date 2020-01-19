@@ -36,7 +36,7 @@ public class MeshVorPieces : MonoBehaviour
         {
             onetime = true;
 
-            TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+            MeshVorDiagram existingBoard = GameObject.Find("MeshParent").GetComponent<MeshVorDiagram>();
             puzzleSize = existingBoard.polygonNumber;
             colorArray = existingBoard.colorArray;
             allColliders = existingBoard.allColliders;
@@ -121,7 +121,7 @@ public class MeshVorPieces : MonoBehaviour
 
     void DropItem()
     {
-        TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+        MeshVorDiagram existingBoard = GameObject.Find("MeshParent").GetComponent<MeshVorDiagram>();
         draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
 
         // see if dropping item on a collider
@@ -193,7 +193,7 @@ public class MeshVorPieces : MonoBehaviour
 
     private void GenerateVariables()
     {
-        TestMesh existingBoard = GameObject.Find("MeshParent").GetComponent<TestMesh>();
+        MeshVorDiagram existingBoard = GameObject.Find("MeshParent").GetComponent<MeshVorDiagram>();
 
         //puzzleSize = existingBoard.polygonNumber;
         startColor = existingBoard.startColor;

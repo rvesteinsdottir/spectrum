@@ -15,15 +15,15 @@ public class ButtonHandler : MonoBehaviour
         {
             case "easy":
             PlayerPrefs.SetInt("Level", 1);
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene("GameScene");
             break;
             case "medium":
             PlayerPrefs.SetInt("Level", 2);
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene("GameScene");
             break;
             case "hard":
             PlayerPrefs.SetInt("Level", 3);
-            SceneManager.LoadScene("SampleScene");
+            SceneManager.LoadScene("GameScene");
             break;
             case "selectColor":
             SceneManager.LoadScene("ColorPickScene");

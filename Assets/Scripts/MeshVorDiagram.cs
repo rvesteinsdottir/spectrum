@@ -5,8 +5,7 @@ using System.Linq;
 using csDelaunay;
 using System.IO;
 
-//[RequireComponent(typeof(MeshFilter))]
-public class TestMesh : MonoBehaviour
+public class MeshVorDiagram : MonoBehaviour
 {
     public int polygonNumber;
     public Color startColor;
@@ -24,10 +23,6 @@ public class TestMesh : MonoBehaviour
     private float lowY;
     private GameObject meshParent;
     public PolygonCollider2D[] allColliders;
-    private float lowestSeenX;
-    private float lowestSeenY;
-    private float highestSeenX;
-    private float highestSeenY;
 
 
     void Start() {
@@ -40,7 +35,6 @@ public class TestMesh : MonoBehaviour
  
         // Create random points
         imageDim = new Vector2(Screen.width - 75, Screen.width - 75);
-        Debug.Log(imageDim);
         startColor = HexToColor(PlayerPrefs.GetString("ColorOne", ColorToHex(Color.red)));
         endColor = HexToColor(PlayerPrefs.GetString("ColorTwo", ColorToHex(Color.blue)));
         points = CreateRandomPoint();
@@ -48,11 +42,6 @@ public class TestMesh : MonoBehaviour
         highY = ((imageDim.y/2)/100f);
         lowX = -highX;
         lowY = -highY;
-        lowestSeenX = ((imageDim.x/2)/100f);
-        lowestSeenY = ((imageDim.y/2)/100f);
-        highestSeenX = 0;
-        highestSeenY = 0;
-
         
         meshParent = GameObject.Find("MeshParent");
         colorArray = new Color[polygonNumber];
@@ -425,7 +414,6 @@ public class TestMesh : MonoBehaviour
     string ColorToHex(Color32 color)
     {
         string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
-        Debug.Log(hex);
         return hex;
     }
     
