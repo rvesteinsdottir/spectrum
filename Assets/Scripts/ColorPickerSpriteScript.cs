@@ -16,7 +16,6 @@ public class ColorPickerSpriteScript : MonoBehaviour
     private GameObject currentColor;
     private GameObject border;
 
-
     void Start()
     {
         SetDisplay();

@@ -21,7 +21,9 @@ public class MeshVorPieces : MonoBehaviour
     public IList<Color> correctMatches = new List<Color>();
     private bool onetime = false;
     private PolygonCollider2D[] allColliders;
+    public AudioSource Click;
 
+   
     void Start()
     {
         GenerateVariables();
@@ -57,6 +59,11 @@ public class MeshVorPieces : MonoBehaviour
             if (draggingItem)
                 DropItem();
         }
+    }
+
+    public void PlayClick()
+    {
+        Click.Play();
     }
 
     Vector2 CurrentTouchPosition
@@ -132,19 +139,18 @@ public class MeshVorPieces : MonoBehaviour
             if (hit.collider != null)
             {
                 selectedCollider = hit.collider;
-                // colliderTexture = (Texture2D)selectedCollider.gameObject.GetComponent<Renderer>().material.mainTexture;
                 int colliderIndex = System.Array.IndexOf(allColliders, selectedCollider);
                 int boxIndex = System.Array.IndexOf(colorArray, draggedObjectColor);
 
-                //Determines if box landed on correct region
-
+                // Determines if box was placed on correct region
                 if (colliderIndex == boxIndex)
                 {
                     correctMatches.Add(draggedObjectColor);
                     selectedCollider.gameObject.GetComponent<MeshRenderer>().enabled = true;
 
-                    ChangeObjectColor(selectedCollider);
+                    PlayClick();
 
+                    ChangeObjectColor(selectedCollider);
                     Destroy(draggedObject);
                 } else 
                 {
