@@ -6,12 +6,12 @@ public class ColorPickerSpriteScript : MonoBehaviour
 {
     public GameObject ColorPickedPrefab;
     public GameObject ColorPickTile;
-    private ColorPickerTriangle CP;
-    private bool isPaint = false;
+    private ColorPickerTriangle ColorPickerTriangle;
+    private bool isChoosingColor = false;
     private GameObject go;
     private GameObject colorOneGo;
-    private GameObject colorTwoGo;
     private Material colorOneMat;
+    private GameObject colorTwoGo;
     private Material colorTwoMat;
     private GameObject currentColor;
     private GameObject border;
@@ -27,14 +27,19 @@ public class ColorPickerSpriteScript : MonoBehaviour
             OnMouseDown();
     }
 
+    void OnMouseDown()
+    {
+        if (IsColorBox())
+            ChangeColor();
+        else if (isChoosingColor)
+            StopPaint();
+        else
+            StartPaint();
+    }
+
     private void SetDisplay()
     {
-        // Set color wheel
-        go = (GameObject)Instantiate(ColorPickedPrefab, transform.position, Quaternion.identity);
-        go.transform.position += new Vector3(0,-2,0);
-        go.transform.localScale = Vector3.one * 4f;
-        go.transform.LookAt(Camera.main.transform);
-        CP = go.GetComponent<ColorPickerTriangle>();
+        DisplayColorWheel();
 
         // Display first color
         colorOneGo = (GameObject)Instantiate(ColorPickTile, new Vector3( -1.25f, 1.5f, 0), Quaternion.identity);
@@ -45,7 +50,6 @@ public class ColorPickerSpriteScript : MonoBehaviour
         colorOneGo.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
         colorOneGo.layer = 9;
 
-
         // Display second color
         colorTwoGo = (GameObject)Instantiate(ColorPickTile, new Vector3( 1.25f, 1.5f, 0), Quaternion.identity);
         colorTwoGo.transform.LookAt(Camera.main.transform);
@@ -55,10 +59,8 @@ public class ColorPickerSpriteScript : MonoBehaviour
         colorTwoGo.GetComponent<SpriteRenderer>().sortingLayerName = "Foreground";
         colorTwoGo.layer = 9;
 
-
         // Display border
         currentColor = colorOneGo;
-
         border = (GameObject)Instantiate(ColorPickTile, transform.position, Quaternion.identity);
         border.transform.position = currentColor.transform.position;
         border.transform.localScale = new Vector3 (0.8f, 0.8f, 1);
@@ -67,17 +69,16 @@ public class ColorPickerSpriteScript : MonoBehaviour
         border.layer = 8;
     }
 
-    void OnMouseDown()
+    private void DisplayColorWheel()
     {
-        if (isColorBox())
-            ChangeColor();
-        else if (isPaint)
-            StopPaint();
-        else
-            StartPaint();
+        go = (GameObject)Instantiate(ColorPickedPrefab, transform.position, Quaternion.identity);
+        go.transform.position += new Vector3(0,-2,0);
+        go.transform.localScale = Vector3.one * 4f;
+        go.transform.LookAt(Camera.main.transform);
+        ColorPickerTriangle = go.GetComponent<ColorPickerTriangle>();
     }
 
-    bool isColorBox()
+    bool IsColorBox()
     {        
         var inputPosition = CurrentTouchPosition;
         int BoardLayerMask =~ LayerMask.GetMask("Board");
@@ -96,12 +97,7 @@ public class ColorPickerSpriteScript : MonoBehaviour
 
         return false;
     }
-
-    private void ChangeColor()
-    {
-        border.transform.position = currentColor.transform.position;
-    }
-
+    
     Vector2 CurrentTouchPosition
     {
         get
@@ -112,25 +108,30 @@ public class ColorPickerSpriteScript : MonoBehaviour
         }
     }
 
+    private void ChangeColor()
+    {
+        border.transform.position = currentColor.transform.position;
+    }
+
     private void StartPaint()
     {
-
-        CP.SetNewColor(currentColor.GetComponent<SpriteRenderer>().material.color);
-        isPaint = true;
+        ColorPickerTriangle.SetNewColor(currentColor.GetComponent<SpriteRenderer>().material.color);
+        isChoosingColor = true;
     }
 
     private void StopPaint()
     {
-        currentColor.GetComponent<SpriteRenderer>().material.color = CP.TheColor;
-        if(currentColor == colorOneGo)
+        currentColor.GetComponent<SpriteRenderer>().material.color = ColorPickerTriangle.TheColor;
+        if (currentColor == colorOneGo)
         {
-            PlayerPrefs.SetString("ColorOne", ColorToHex(CP.TheColor));
+            PlayerPrefs.SetString("ColorOne", ColorToHex(ColorPickerTriangle.TheColor));
         }
         else
         {
-            PlayerPrefs.SetString("ColorTwo", ColorToHex(CP.TheColor));
+            PlayerPrefs.SetString("ColorTwo", ColorToHex(ColorPickerTriangle.TheColor));
         }
-        isPaint = false;
+        
+        isChoosingColor = false;
     }
 
     public void RefreshGame()
@@ -139,8 +140,7 @@ public class ColorPickerSpriteScript : MonoBehaviour
         colorTwoGo.GetComponent<SpriteRenderer>().material.color = HexToColor(PlayerPrefs.GetString("ColorTwo"));
     }
 
-
-    //CREDIT
+    //ColorToHex and HexToColor methods adapted from method published by Grish_tad on Unity Forum on December 29, 2017 (https://answers.unity.com/questions/1447929/how-to-save-color.html)
     string ColorToHex(Color32 color)
     {
         string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");

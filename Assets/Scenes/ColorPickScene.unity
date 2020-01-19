@@ -463,7 +463,7 @@ GameObject:
   - component: {fileID: 928207380}
   - component: {fileID: 928207379}
   - component: {fileID: 928207378}
-  - component: {fileID: 928207377}
+  - component: {fileID: 928207381}
   m_Layer: 5
   m_Name: reset
   m_TagString: Untagged
@@ -490,18 +490,6 @@ RectTransform:
   m_AnchoredPosition: {x: 577, y: -77.405}
   m_SizeDelta: {x: 51.35, y: 43.92}
   m_Pivot: {x: 0.50000006, y: 0.5}
---- !u!114 &928207377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 928207375}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cd9b8c454083413db536d87d1036985, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &928207378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -542,8 +530,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 928207377}
-        m_MethodName: refreshGame
+      - m_Target: {fileID: 928207381}
+        m_MethodName: RefreshGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -588,6 +576,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 928207375}
   m_CullTransparentMesh: 0
+--- !u!114 &928207381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928207375}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd6c0fc2c1d84d3dae26e654d0c8974, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1181970266
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,7 +839,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1950904404}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60e5f428cdeec433ba47149811efeaad, type: 3}
+  m_Script: {fileID: 11500000, guid: 7cd6c0fc2c1d84d3dae26e654d0c8974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1950904407
@@ -883,7 +883,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1950904406}
-        m_MethodName: returnHome
+        m_MethodName: ReturnHome
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

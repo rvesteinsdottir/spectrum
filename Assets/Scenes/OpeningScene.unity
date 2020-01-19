@@ -233,7 +233,7 @@ GameObject:
   - component: {fileID: 432467326}
   - component: {fileID: 432467330}
   m_Layer: 5
-  m_Name: medium
+  m_Name: Medium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -312,7 +312,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 432467326}
-        m_MethodName: playgame
+        m_MethodName: ChooseLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -796,7 +796,7 @@ GameObject:
   - component: {fileID: 1422160287}
   - component: {fileID: 1422160286}
   m_Layer: 5
-  m_Name: selectColor
+  m_Name: SelectColor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -875,7 +875,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1422160286}
-        m_MethodName: playgame
+        m_MethodName: SelectGameColors
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -934,7 +934,7 @@ GameObject:
   - component: {fileID: 1423093839}
   - component: {fileID: 1423093838}
   m_Layer: 5
-  m_Name: hard
+  m_Name: Hard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1013,7 +1013,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1423093838}
-        m_MethodName: playgame
+        m_MethodName: ChooseLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1459,7 +1459,7 @@ GameObject:
   - component: {fileID: 2074577787}
   - component: {fileID: 2074577790}
   m_Layer: 5
-  m_Name: easy
+  m_Name: Easy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1526,7 +1526,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2074577790}
-        m_MethodName: playgame
+        m_MethodName: ChooseLevel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
