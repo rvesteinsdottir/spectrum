@@ -21,46 +21,51 @@ public class MeshVorDiagram : MonoBehaviour
     private float highY;
     private float lowX;
     private float lowY;
-    private GameObject meshParent;
+    private GameObject voronoiDiagram;
     public PolygonCollider2D[] allColliders;
 
 
     void Start() {
-        if(PlayerPrefs.GetInt("Level") == 1)
+        if (PlayerPrefs.GetInt("Level") == 1)
             polygonNumber = 6;
         else if (PlayerPrefs.GetInt("Level") == 2)
             polygonNumber = 8;
         else
             polygonNumber = 10;
- 
-        // Create random points
-        imageDim = new Vector2(Screen.width - 75, Screen.width - 75);
-        startColor = HexToColor(PlayerPrefs.GetString("ColorOne", ColorToHex(Color.red)));
-        endColor = HexToColor(PlayerPrefs.GetString("ColorTwo", ColorToHex(Color.blue)));
-        points = CreateRandomPoint();
-        highX = ((imageDim.x/2)/100f);
-        highY = ((imageDim.y/2)/100f);
-        lowX = -highX;
-        lowY = -highY;
-        
-        meshParent = GameObject.Find("MeshParent");
-        colorArray = new Color[polygonNumber];
-    
-        Rectf bounds = new Rectf(0,0,imageDim.x,imageDim.y);
-        Voronoi voronoi = new Voronoi(points,bounds);
- 
-        sites = voronoi.SitesIndexedByLocation;
-        edges = voronoi.Edges;
- 
+
+        GenerateVariables();
         DisplayDiagram();
         DisplayEdges();
     }
 
 
-    // Method from csDelunay library creator PouletFrit on May 26, 2014 via Unity Forum (https://forum.unity.com/threads/delaunay-voronoi-diagram-library-for-unity.248962/)
+    private void GenerateVariables()
+    {
+        // Generate display from platform dimensions
+        imageDim = new Vector2(Screen.width - 75, Screen.width - 75);
+        highX = ((imageDim.x/2)/100f);
+        highY = ((imageDim.y/2)/100f);
+        lowX = -highX;
+        lowY = -highY;
+
+        // Fetch color preferences
+        startColor = HexToColor(PlayerPrefs.GetString("ColorOne", ColorToHex(Color.red)));
+        endColor = HexToColor(PlayerPrefs.GetString("ColorTwo", ColorToHex(Color.blue)));
+        colorArray = new Color[polygonNumber];
+
+        // Create random set of points for diagram
+        points = CreateRandomPoint();
+        Rectf bounds = new Rectf(0,0,imageDim.x,imageDim.y);
+        Voronoi voronoi = new Voronoi(points,bounds);
+        sites = voronoi.SitesIndexedByLocation;
+        edges = voronoi.Edges;
+    }
+
+    // CreateRandomPoints method from csDelunay library creator PouletFrit on May 26, 2014 via Unity Forum (https://forum.unity.com/threads/delaunay-voronoi-diagram-library-for-unity.248962/)
     private List<Vector2f> CreateRandomPoint() {
         List<Vector2f> points = new List<Vector2f>();
-        for (int i = 0; i < polygonNumber; i++) {
+
+        for (int pointCount = 0; pointCount < polygonNumber; pointCount++) {
             points.Add(new Vector2f(Random.Range(0,imageDim.x), Random.Range(0,imageDim.y)));
         }
  
@@ -68,27 +73,16 @@ public class MeshVorDiagram : MonoBehaviour
     }
 
     private void DisplayDiagram() {
+        voronoiDiagram = GameObject.Find("VoronoiDiagram");
         Color tileWidth = ((endColor - startColor)/imageDim.x);
-        int index = 0;
         allColliders = new PolygonCollider2D[polygonNumber];
-        adjustedPoints = new List<Vector2>();
 
         Vector2f[] siteKeys = sites.Keys.ToArray();
+        GenerateAdjustedPoints();
 
-        for (int j = 0; j < siteKeys.Length; j++)
+        for (int siteKeyIndex = 0; siteKeyIndex < siteKeys.Length; siteKeyIndex++)
         {
-            Vector2f entryKey = siteKeys[j];
-
-            Site entryValue = sites[entryKey];
-
-            float sitePosX = ((entryValue.x - imageDim.x/2)/100f);
-            float sitePosY = ((entryValue.y - imageDim.y/2)/100f);
-            adjustedPoints.Add(new Vector2(sitePosX, sitePosY));
-        }
-
-        for (int i = 0; i < siteKeys.Length; i++)
-        {
-            Vector2f entryKey = siteKeys[i];
+            Vector2f entryKey = siteKeys[siteKeyIndex];
             Site entryValue = sites[entryKey];
             
             // Generate mesh vertices from Voronoi region edges
@@ -98,42 +92,62 @@ public class MeshVorDiagram : MonoBehaviour
             List<Vector2> uniqueVerticesList = allVertices.Distinct().ToList();
 
             // Sort list in counter clockwise order for triangulation
-            uniqueVerticesList.Sort((v, w) => compare(v, w, adjustedPoints[i]));
-
-            Color tileColor = (startColor + (tileWidth * entryValue.y));
-            //Color tileColor = Color.white;
-            colorArray[index] = tileColor;
+            uniqueVerticesList.Sort((a, b) => compare(a, b, adjustedPoints[siteKeyIndex]));
             Vector2[] uniqueVerticesArray = uniqueVerticesList.ToArray();
 
-            allColliders[index] = GenerateGameObject(uniqueVerticesArray, tileColor);
-            index ++;
+            // Generate tile color based on points relation to y axis
+            Color tileColor = (startColor + (tileWidth * entryValue.y));
+            colorArray[siteKeyIndex] = tileColor;
+            
+            allColliders[siteKeyIndex] = GenerateGameObject(uniqueVerticesArray, tileColor);
+        }
+    }
+
+    private void GenerateAdjustedPoints()
+    {
+        adjustedPoints = new List<Vector2>();
+        Vector2f[] siteKeys = sites.Keys.ToArray();
+
+        for (int siteKeyIndex = 0; siteKeyIndex < siteKeys.Length; siteKeyIndex++)
+        {
+            Vector2f entryKey = siteKeys[siteKeyIndex];
+            Site entryValue = sites[entryKey];
+
+            // Change location of point from pixel to vector
+            float sitePosX = AdjustedPosition("x", entryValue.x);
+            float sitePosY = AdjustedPosition("y", entryValue.y);
+
+            adjustedPoints.Add(new Vector2(sitePosX, sitePosY));
         }
     }
 
     PolygonCollider2D GenerateGameObject(Vector2[] uniqueVerticesArray, Color tileColor)
     {
-        GameObject newGameObject = new GameObject("MeshPolygon");
-        newGameObject.transform.SetParent(meshParent.transform);
-        newGameObject.transform.localPosition = new Vector3(0f, 0f, -2f);
-        newGameObject.layer = LayerMask.NameToLayer("Board");
+        GameObject polygonGO = new GameObject("MeshPolygon");
+        polygonGO.transform.SetParent(voronoiDiagram.transform);
+        polygonGO.transform.localPosition = new Vector3(0f, 0f, -2f);
+        polygonGO.layer = LayerMask.NameToLayer("Board");
 
-        GenerateMesh(newGameObject, uniqueVerticesArray);
+        AddMesh(polygonGO, uniqueVerticesArray);
 
-        // Add texture based on y position of center
+        // Create texture for game object
         Texture2D texture = new Texture2D(128, 128, TextureFormat.ARGB32, false);
-        for (int y = 0; y < texture.height; y++)
+        for (int row = 0; row < texture.height; row++)
         {
-            for (int x = 0; x < texture.width; x++)
-                texture.SetPixel(x, y, Color.white);
+            for (int col = 0; col < texture.width; col++)
+                texture.SetPixel(row, col, tileColor);
         }
         texture.Apply();
+
         Material newMaterial = new Material(Shader.Find("Unlit/Texture"));
         newMaterial.mainTexture = texture;
-        newGameObject.GetComponent<MeshRenderer>().material = newMaterial; 
-        newGameObject.GetComponent<MeshRenderer>().enabled = false;
+        polygonGO.GetComponent<MeshRenderer>().material = newMaterial; 
+
+        // Disable game object until tile is correctly placed
+        polygonGO.GetComponent<MeshRenderer>().enabled = false;
 
         // Add polygon collider
-        PolygonCollider2D newCollider = newGameObject.AddComponent<PolygonCollider2D>();
+        PolygonCollider2D newCollider = polygonGO.AddComponent<PolygonCollider2D>();
         newCollider.points = uniqueVerticesArray;
         newCollider.SetPath(0, uniqueVerticesArray);
         newCollider.isTrigger = true;
@@ -141,24 +155,24 @@ public class MeshVorDiagram : MonoBehaviour
         return newCollider;
     }
 
-    private void GenerateMesh(GameObject newGameObject, Vector2[] uniqueVerticesArray)
+    private void AddMesh(GameObject newPolygonGO, Vector2[] uniqueVerticesArray)
     {
         Vector3[] uniqueVertices3D = new Vector3[uniqueVerticesArray.Length];
 
-        for (int i = 0; i < uniqueVerticesArray.Length; i++)
+        for (int index = 0; index < uniqueVerticesArray.Length; index++)
         {
-            uniqueVertices3D[i] = new Vector3(uniqueVerticesArray[i].x, uniqueVerticesArray[i].y, 1);
+            uniqueVertices3D[index] = new Vector3(uniqueVerticesArray[index].x, uniqueVerticesArray[index].y, 1);
         }
 
-        newGameObject.AddComponent<MeshFilter>();
-        newGameObject.AddComponent<MeshRenderer>();
+        newPolygonGO.AddComponent<MeshFilter>();
+        newPolygonGO.AddComponent<MeshRenderer>();
 
-        // Use the triangulator to get indices for creating mesh triangles
+        // Use triangulator to get indices for creating mesh triangles
         Triangulator tr = new Triangulator(uniqueVerticesArray);
         int[] indices = tr.Triangulate();
 
         // Add mesh to new game object
-        Mesh mesh = newGameObject.GetComponent<MeshFilter>().mesh;
+        Mesh mesh = newPolygonGO.GetComponent<MeshFilter>().mesh;
         mesh.Clear();
         mesh.vertices = uniqueVertices3D;
         mesh.triangles = indices;
@@ -168,39 +182,39 @@ public class MeshVorDiagram : MonoBehaviour
 
     List<Vector2> GenerateVertices(Site newSite)
     {
-        
-        float sitePosX = ((newSite.x - imageDim.x/2)/100f);
-        float sitePosY = ((newSite.y - imageDim.x/2)/100f);
-        Vector2 center = new Vector2(sitePosX, sitePosY);
+        Vector2 center = new Vector2(AdjustedPosition("x", newSite.x), AdjustedPosition("y", newSite.y));
+        List<Edge> siteEdges = newSite.Edges;
+        List<Vector2> vertices2D = new List<Vector2>();
         bool containsLowX = false;
         bool containsLowY = false;
         bool containsHighX = false;
         bool containsHighY = false;
 
-        List<Edge> siteEdges = newSite.Edges;
-        List<Vector2> vertices2D = new List<Vector2>();
-
-        // Reduce to an array of all vertices of each edge
-        for (int i = 0; i < siteEdges.Count; i++)
+        // Create an array of all vertices of each edge
+        for (int edgeIndex = 0; edgeIndex < siteEdges.Count; edgeIndex++)
         {
-            if (siteEdges[i].ClippedEnds == null) continue;
+            if (siteEdges[edgeIndex].ClippedEnds == null) continue;
             
-            Vector2 leftVertex = new Vector2(siteEdges[i].ClippedEnds[LR.LEFT].x, siteEdges[i].ClippedEnds[LR.LEFT].y);
-            Vector2 adjustedLeft = new Vector2(((leftVertex.x-imageDim.x/2)/100f), (leftVertex.y-imageDim.y/2)/100f);
+            Vector2 leftVertex = new Vector2(siteEdges[edgeIndex].ClippedEnds[LR.LEFT].x, siteEdges[edgeIndex].ClippedEnds[LR.LEFT].y);
+            Vector2 adjustedLeft = new Vector2(AdjustedPosition("x", leftVertex.x), AdjustedPosition("y", leftVertex.y));
 
-            Vector2 rightVertex = new Vector2(siteEdges[i].ClippedEnds[LR.RIGHT].x, siteEdges[i].ClippedEnds[LR.RIGHT].y);
-            Vector2 adjustedRight = new Vector2(((rightVertex.x-imageDim.x/2)/100f), (rightVertex.y-imageDim.y/2)/100f);
+            Vector2 rightVertex = new Vector2(siteEdges[edgeIndex].ClippedEnds[LR.RIGHT].x, siteEdges[edgeIndex].ClippedEnds[LR.RIGHT].y);
+            Vector2 adjustedRight = new Vector2(AdjustedPosition("x", rightVertex.x), AdjustedPosition("y", rightVertex.y));
             
             vertices2D.Add(new Vector2(adjustedLeft.x, adjustedLeft.y));
             vertices2D.Add(new Vector2(adjustedRight.x, adjustedRight.y));
+        }
 
-            if (adjustedLeft.x == lowX || adjustedRight.x == lowX)
+        // Check to see if any corners need to be added to polygon
+        for (int vertexIndex = 0; vertexIndex < vertices2D.Count; vertexIndex++)
+        {
+            if (vertices2D[vertexIndex].x == lowX)
                 containsLowX = true;
-            if (adjustedLeft.y == lowY || adjustedRight.y == lowY)
+            if (vertices2D[vertexIndex].y == lowX)
                 containsLowY = true;
-            if (adjustedLeft.x == highX || adjustedRight.x == highX)
+            if (vertices2D[vertexIndex].x == highX)
                 containsHighX = true;
-            if (adjustedLeft.y == highY || adjustedRight.y == highY)
+            if (vertices2D[vertexIndex].y == highY)
                 containsHighY = true;
         }
 
@@ -215,8 +229,6 @@ public class MeshVorDiagram : MonoBehaviour
             vertices2D.Add(new Vector2(highX, lowY));
         else if (containsHighY && containsLowY)
         {
-            // cannot be ANY vertex, must be the lowest or highest
-            //if (vertices2D[0].x > 0 && isOuterCentroid("upperRight", center) && isOuterCentroid("lowerRight", center))
             if (isOuterCentroid("upperRight", center) && isOuterCentroid("lowerRight", center))
             {
                 vertices2D.Add(new Vector2(highX, highY));
@@ -230,7 +242,6 @@ public class MeshVorDiagram : MonoBehaviour
         }
         else if (containsHighX && containsLowX)
         {
-            // cannot be ANY vertex, must be the lowest or highest
             if (isOuterCentroid("upperRight", center) && isOuterCentroid("upperLeft", center))
             {
                 vertices2D.Add(new Vector2(lowX, highY));
@@ -365,7 +376,7 @@ public class MeshVorDiagram : MonoBehaviour
     {
         float smallestDist = float.MaxValue;
         int index = 0;
-        Vector2 adjustedPos = new Vector2(((pixelPos.x - imageDim.x/2)/100f), ((pixelPos.y - imageDim.y/2)/100f));
+        Vector2 adjustedPos = new Vector2( AdjustedPosition("x", pixelPos.x), AdjustedPosition("y", pixelPos.y));
 
         for (int i = 0; i < adjustedPoints.Count; i++)
         {
@@ -376,6 +387,14 @@ public class MeshVorDiagram : MonoBehaviour
             }
         }
         return colorArray[index];
+    }
+
+    float AdjustedPosition(string axis, float currentValue)
+    {
+        if (axis == "x")
+            return ((currentValue - imageDim.x/2)/100f);
+        else
+            return ((currentValue - imageDim.y/2)/100f);
     }
  
     // Bresenham line algorithm

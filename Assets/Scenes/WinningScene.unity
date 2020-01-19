@@ -10347,7 +10347,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2028174483}
-        m_MethodName: returnHome
+        m_MethodName: ReturnHome
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10401,6 +10401,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2028174478}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60e5f428cdeec433ba47149811efeaad, type: 3}
+  m_Script: {fileID: 11500000, guid: 7cd6c0fc2c1d84d3dae26e654d0c8974, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

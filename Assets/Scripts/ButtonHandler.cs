@@ -35,7 +35,7 @@ public class ButtonHandler : MonoBehaviour
     public void ReturnHome() 
     {
         if (SceneManager.GetActiveScene().name == "WinningScene"){
-            Destroy(GameObject.Find("MeshParent"));
+            Destroy(GameObject.Find("VoronoiDiagram"));
         }
 
         SceneManager.LoadScene("OpeningScene");

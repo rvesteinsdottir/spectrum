@@ -594,7 +594,7 @@ GameObject:
   - component: {fileID: 714720098}
   - component: {fileID: 714720099}
   m_Layer: 8
-  m_Name: MeshParent
+  m_Name: VoronoiDiagram
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
