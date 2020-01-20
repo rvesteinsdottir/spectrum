@@ -12,7 +12,6 @@ public class MeshVorDiagram : MonoBehaviour
     public Color endColor;
     public Vector2 imageDim;
     public Color[] colorArray;
- 
     private List<Vector2f> points;
     private List<Vector2> adjustedPoints;
     private Dictionary<Vector2f, Site> sites;
@@ -340,10 +339,9 @@ public class MeshVorDiagram : MonoBehaviour
             Edge edge = edges[edgeIndex];
 
             if (edge.ClippedEnds == null) continue;
-
             DrawLine(edge.ClippedEnds[LR.LEFT], edge.ClippedEnds[LR.RIGHT], diagramTexture, borderColor);
 
-            // Set remaining sections of texture to white
+            // Set remaining sections of texture to transparent
             for (int row = 0; row < imageDim.x; row++)
             {
                 for (int column = 0; column < imageDim.y; column++)
@@ -381,6 +379,7 @@ public class MeshVorDiagram : MonoBehaviour
             index = i;
             }
         }
+
         return colorArray[index];
     }
 
@@ -392,8 +391,7 @@ public class MeshVorDiagram : MonoBehaviour
             return ((currentValue - imageDim.y/2)/100f);
     }
  
-    // DrawLine method from csDelunay library creator PouletFrit on May 26, 2014 via Unity Forum (https://forum.unity.com/threads/delaunay-voronoi-diagram-library-for-unity.248962/)
-    // Bresenham line algorithm
+    // DrawLine method (Bresenham line algorithm) from csDelunay library creator PouletFrit on May 26, 2014 via Unity Forum (https://forum.unity.com/threads/delaunay-voronoi-diagram-library-for-unity.248962/)
     private void DrawLine(Vector2f p0, Vector2f p1, Texture2D tx, Color c, int offset = 0) {
         int x0 = (int)p0.x;
         int y0 = (int)p0.y;

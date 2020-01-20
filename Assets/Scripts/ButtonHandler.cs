@@ -13,17 +13,17 @@ public class ButtonHandler : MonoBehaviour
         switch (button.name)
         {
             case "Easy":
-            PlayerPrefs.SetInt("Level", 1);
-            SceneManager.LoadScene("GameScene");
-            break;
+                PlayerPrefs.SetInt("Level", 1);
+                SceneManager.LoadScene("GameScene");
+                break;
             case "Medium":
-            PlayerPrefs.SetInt("Level", 2);
-            SceneManager.LoadScene("GameScene");
-            break;
+                PlayerPrefs.SetInt("Level", 2);
+                SceneManager.LoadScene("GameScene");
+                break;
             case "Hard":
-            PlayerPrefs.SetInt("Level", 3);
-            SceneManager.LoadScene("GameScene");
-            break;
+                PlayerPrefs.SetInt("Level", 3);
+                SceneManager.LoadScene("GameScene");
+                break;
         }
     }
 

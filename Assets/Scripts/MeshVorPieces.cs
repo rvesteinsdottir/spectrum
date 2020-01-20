@@ -31,7 +31,6 @@ public class MeshVorPieces : MonoBehaviour
 
     private void Update()
     {   
-        // Store Dictionary of desired tile position
         if (!onetime)
         {
             onetime = true;
@@ -42,28 +41,21 @@ public class MeshVorPieces : MonoBehaviour
             allColliders = existingBoard.allColliders;
 
             colorList = new List<Color>();
-            for (int index = 0; index < colorArray.Length; index++)
+            for (int colorIndex = 0; colorIndex < colorArray.Length; colorIndex++)
             {
-                colorList.Add(colorArray[index]);
+                colorList.Add(colorArray[colorIndex]);
             }
 
             GenerateTiles();
         }
 
         if (HasInput)
-        {
             DragOrPickUp();
-        }
         else
         {
             if (draggingItem)
                 DropItem();
         }
-    }
-
-    public void PlayClick()
-    {
-        Click.Play();
     }
 
     Vector2 CurrentTouchPosition
@@ -76,7 +68,12 @@ public class MeshVorPieces : MonoBehaviour
         }
     }
 
-    //Method adapted from Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
+    private void PlayClick()
+    {
+        Click.Play();
+    }
+
+    // Method adapted from Unity School article, November 4, 2015 (http://unity.grogansoft.com/drag-and-drop/)
     private void DragOrPickUp()
     {
         var inputPosition = CurrentTouchPosition;
@@ -84,15 +81,13 @@ public class MeshVorPieces : MonoBehaviour
         if (draggingItem)
         {
             Vector2 newLocation = inputPosition + touchOffset;
-            draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -1f);
-
-            //draggedObject.transform.position = newLocation;
+            draggedObject.transform.position = new Vector3( newLocation.x, newLocation.y, -3f);
         }
         else
         {
             int BoardLayerMask =~ LayerMask.GetMask("Board");
 
-            RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f, BoardLayerMask);
+            RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, -2.2f, BoardLayerMask);
 
             if (touches.Length > 0)
             {
@@ -105,7 +100,6 @@ public class MeshVorPieces : MonoBehaviour
 
                     // Increase object size when being dragged
                     draggedObject.transform.localScale = new Vector3(1.7f, 1.7f, 1f);
-
                 }
             }
         }
@@ -124,13 +118,9 @@ public class MeshVorPieces : MonoBehaviour
         MeshVorDiagram existingBoard = GameObject.Find("VoronoiDiagram").GetComponent<MeshVorDiagram>();
         draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
 
-        // see if dropping item on a collider
         var inputPosition = CurrentTouchPosition;
         Collider2D selectedCollider;
 
-        // draggedObject.transform.localPosition = new Vector3(draggedObject.transform.localPosition.x, draggedObject.transform.localPosition.y, -2);
-
-        // Is this layer mask doing anything?
         RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.2f);
 
         if (touches.Length > 0)
