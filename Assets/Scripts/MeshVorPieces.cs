@@ -26,7 +26,10 @@ public class MeshVorPieces : MonoBehaviour
    
     void Start()
     {
-        GenerateVariables();
+        MeshVorDiagram existingBoard = GameObject.Find("VoronoiDiagram").GetComponent<MeshVorDiagram>();
+
+        startColor = existingBoard.startColor;
+        endColor = existingBoard.endColor;
     }
 
     private void Update()
@@ -117,7 +120,6 @@ public class MeshVorPieces : MonoBehaviour
     {
         MeshVorDiagram existingBoard = GameObject.Find("VoronoiDiagram").GetComponent<MeshVorDiagram>();
         draggedObjectColor = draggedObject.GetComponent<Renderer>().material.color;
-
         var inputPosition = CurrentTouchPosition;
         Collider2D selectedCollider;
 
@@ -139,8 +141,6 @@ public class MeshVorPieces : MonoBehaviour
                     selectedCollider.gameObject.GetComponent<MeshRenderer>().enabled = true;
 
                     PlayClick();
-
-                    ChangeObjectColor(selectedCollider);
                     Destroy(draggedObject);
                 } else 
                 {
@@ -158,36 +158,6 @@ public class MeshVorPieces : MonoBehaviour
 
         draggingItem = false;
         draggedObject.transform.localScale = new Vector3(1.5f, 1.5f, 1f);
-
-    }
-
-    private void ChangeObjectColor(Collider2D selectedCollider)
-    {
-        Material objectMaterial = selectedCollider.gameObject.GetComponent<Renderer>().material;
-        Texture2D texture = new Texture2D(128, 128);
-        for (int y = 0; y < texture.height; y++)
-        {
-            for (int x = 0; x < texture.width; x++)
-                texture.SetPixel(x, y, draggedObjectColor);
-        }
-        texture.Apply();
-
-        objectMaterial.mainTexture = texture;
-        selectedCollider.gameObject.GetComponent<MeshRenderer>().material = objectMaterial; 
-    }
-  
-    float RGBdiff(Color c1, Color c2)
-    {
-        return Mathf.Abs(c1.r - c2.r) + Mathf.Abs(c1.g - c2.g) + Mathf.Abs(c1.b - c2.b);
-    }
-
-    private void GenerateVariables()
-    {
-        MeshVorDiagram existingBoard = GameObject.Find("VoronoiDiagram").GetComponent<MeshVorDiagram>();
-
-        //puzzleSize = existingBoard.polygonNumber;
-        startColor = existingBoard.startColor;
-        endColor = existingBoard.endColor;
     }
 
     private void GenerateTiles()
@@ -201,9 +171,9 @@ public class MeshVorPieces : MonoBehaviour
         for (int i = 0; i < puzzleSize; i++)
         {
             GameObject tile = (GameObject)Instantiate(referenceTile, transform);
-
             float posX = i * tileSize + 0.5f;
             float posY = 5;
+
             if (i >= puzzleSize/2)
             {
                 posX = (i - puzzleSize/2) * tileSize + 0.5f;
@@ -220,30 +190,33 @@ public class MeshVorPieces : MonoBehaviour
             Color tileColor = colorList[randomIndex];
             colorList.RemoveAt(randomIndex);
             tile.GetComponent<Renderer>().material.color = tileColor;
-
-            //initialPosition.Add(tileColor, tile.transform.position);
         }
 
         Destroy(referenceTile);
 
-        //Changes pivot point for tiles is in the center
         transform.position = new Vector3((-(gridWidth/2 + tileSize/2)), (gridHeight/2 - tileSize/2)-3, transform.position.z);
 
-        GameObject puzzleBank = (GameObject)Instantiate(Resources.Load("PuzzleBank2"), transform);
-        puzzleBank.GetComponent<Renderer>().material.color = new Color (1, 1, 1);
-        puzzleBank.transform.position = new Vector3(0f, 2.52f, 0);
+        CreatePuzzleBank();
+        AddChildrenToTranform();
+    }
 
+    private void CreatePuzzleBank()
+    {
+        GameObject puzzleBank = (GameObject)Instantiate(Resources.Load("PuzzleBank2"), transform);
         puzzleBank.name = "PuzzleBank";
         puzzleBank.layer = LayerMask.NameToLayer("Board");
+        puzzleBank.GetComponent<Renderer>().material.color = new Color (1, 1, 1);
+        puzzleBank.transform.position = new Vector3(0f, 2.52f, 0);
         puzzleBank.transform.localScale = new Vector3((1f + (0.5f * puzzleSize/2)), 3.5f, 0);
+    }
 
-
-        for (int j = 0; j < transform.childCount; j++)
+    private void AddChildrenToTranform()
+    {
+        for (int transformChildIndex = 0; transformChildIndex < transform.childCount; transformChildIndex++)
         {
-            Transform child = transform.GetChild(j); 
+            Transform child = transform.GetChild(transformChildIndex); 
             initialPosition.Add(child.GetComponent<Renderer>().material.color, child.position);
         }
-
     }
 
     private void DisplayWinningScreen()

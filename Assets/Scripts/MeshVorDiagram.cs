@@ -42,8 +42,8 @@ public class MeshVorDiagram : MonoBehaviour
     {
         // Generate display from platform dimensions
         imageDim = new Vector2(Screen.width - 75, Screen.width - 75);
-        highX = ((imageDim.x/2)/100f);
-        highY = ((imageDim.y/2)/100f);
+        highX = (imageDim.x/2)/100f;
+        highY = (imageDim.y/2)/100f;
         lowX = -highX;
         lowY = -highY;
 
