@@ -56,7 +56,6 @@ public class ButtonHandler : MonoBehaviour
     string ColorToHex(Color32 color)
     {
         string hex = color.r.ToString("X2") + color.g.ToString("X2") + color.b.ToString("X2");
-        Debug.Log(hex);
         return hex;
     }
 }
