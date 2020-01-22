@@ -8,9 +8,7 @@ Spectrum is a free and open source color gradient game. Puzzle boards are genera
 [About The Creator](#about-the-creator) <br>
 [License](#license) <br>
 
-<img src="https://user-images.githubusercontent.com/52141232/72937161-6f5e0500-3d1d-11ea-95fc-b621ccc0668e.png" alt="Spectrum Opening Window" width = 200 display="inline">
-<img src="https://user-images.githubusercontent.com/52141232/72937563-38d4ba00-3d1e-11ea-9c0a-8a0c592462f3.png" alt="Spectrum Color Picker" width = 200 display="inline"> 
-<img src="https://user-images.githubusercontent.com/52141232/72937524-28bcda80-3d1e-11ea-9428-e66f5dbaed9d.png" alt="Spectrum Game Window 2" width = 200 display="inline">
+<img src="https://user-images.githubusercontent.com/52141232/72937161-6f5e0500-3d1d-11ea-95fc-b621ccc0668e.png" alt="Spectrum Opening Window" width = 200 display="inline"> <img src="https://user-images.githubusercontent.com/52141232/72937563-38d4ba00-3d1e-11ea-9c0a-8a0c592462f3.png" alt="Spectrum Color Picker" width = 200 display="inline"> <img src="https://user-images.githubusercontent.com/52141232/72937524-28bcda80-3d1e-11ea-9428-e66f5dbaed9d.png" alt="Spectrum Game Window 2" width = 200 display="inline">
 
 ## Getting Started
 1. [Download](#downloads) require software and source code 
