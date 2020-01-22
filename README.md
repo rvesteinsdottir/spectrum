@@ -23,18 +23,13 @@ photo photo
 
 **Download Source Code** <br>
 Use one of the following methods to download Spectrum source code:
-- [Download source code to Finder](https://github.com/rvesteinsdottir/Spectrum#download)
-- Clone the repository locally: 
-```
-git clone https://github.com/rvesteinsdottir/spectrum.git
-```
+- [Download source code to Finder](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/rvesteinsdottir/spectrum)
+- Clone the repository locally: ```  git clone https://github.com/rvesteinsdottir/spectrum.git  ```
 
 ### Setup
 Open repository in Unity:
-1. Open Unity
-2. Select Open and navigate to downloaded spectrum-master folder and open in Unity
-3. Once project is opened, select File -> Build Settings
-4. Select iOS and select "Switch Platform"
+1. Open Unity and select Open, navigate to downloaded spectrum-master folder and open in Unity
+2. Once project is opened, select File -> Build Settings. In Build Settings select iOS and click "Switch Platform"
 
 ### (Optional) Build and Run 
 Set Player Settings in Unity:
@@ -42,11 +37,11 @@ Set Player Settings in Unity:
     - Device SDK for iPhone build
     - **OR** Simulator SDK for iPhone Simulator build
 2. Player Settings -> Other Settings confirm Identification Bundle Identifier is "game.unity2d.Spectrum"
-3. Select File -> Build Settings -> Build
-4. Once build is complete, open build folder, open file "Unity-iPhone.xcodeproj" in XCode
+3. Once Player Settings are confirmed, navigate to File -> Build Settings -> Build
+4. After build is complete, open build folder. Open file "Unity-iPhone.xcodeproj" in XCode
 
 Set up Xcode to run the project:
-1. XCode -> Preferences -> Accounts. Select or add your Apple ID
+1. XCode -> Preferences -> Accounts, select or add your Apple ID
 2. In menu on the top left, click folder icon to show Project Navigator
 3. Double click on Unity-iPhone
 4. Select Signing & Capabilities
@@ -74,5 +69,5 @@ Voronoi Diagram Library: [C# Delaunay Library](https://github.com/PouletFrit/csD
 
 ## License
 
-Copyright (c) 2020, [Raisah Vesteinsdottir](https://github.com/rvesteinsdottir/Spectrum/LICENSE)
+MIT License, [Raisah Vesteinsdottir](https://github.com/rvesteinsdottir/spectrum/blob/master/LICENSE)
 
