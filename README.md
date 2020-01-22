@@ -1,12 +1,12 @@
 # Spectrum
 Spectrum is a free and open source color gradient game. Puzzle boards are generated at random using voronoi diagrams. <br>
 
-[Getting Started](#getting-started)<br>
-[Downloads](#downloads)<br>
-[Screenshots](#screenshots)<br>
-[Credits](#credits) <br>
-[About The Creator](#about-the-creator) <br>
-[License](#license) <br>
+:small_blue_diamond: [Getting Started](#getting-started)<br>
+:small_blue_diamond: [Downloads](#downloads)<br>
+:small_blue_diamond: [Screenshots](#screenshots)<br>
+:small_blue_diamond: [Credits](#credits) <br>
+:small_blue_diamond: [About The Creator](#about-the-creator) <br>
+:small_blue_diamond: [License](#license) <br>
 
 <img src="https://user-images.githubusercontent.com/52141232/72937161-6f5e0500-3d1d-11ea-95fc-b621ccc0668e.png" alt="Spectrum Opening Window" width = 200 display="inline"> <img src="https://user-images.githubusercontent.com/52141232/72937563-38d4ba00-3d1e-11ea-9c0a-8a0c592462f3.png" alt="Spectrum Color Picker" width = 200 display="inline"> <img src="https://user-images.githubusercontent.com/52141232/72937524-28bcda80-3d1e-11ea-9428-e66f5dbaed9d.png" alt="Spectrum Game Window 2" width = 200 display="inline">
 
@@ -17,9 +17,9 @@ Spectrum is a free and open source color gradient game. Puzzle boards are genera
 
 ### Downloads
 **Requirements**
-- [Unity Game Engine](https://unity.com/) version 2018.4.14f1
+- <a href="https://unity.com/" target="_blank">Unity Game Engine</a> version 2018.4.14f1
 - Computer
-- (Optional) [Apple XCode](https://developer.apple.com/xcode/) version 11.3.1
+- (Optional) <a href="https://developer.apple.com/xcode/" target="_blank">Apple XCode</a> version 11.3.1
 - (Optional) iPhone SE or iPhone SE Simulator
 
 **Download Source Code** <br>
@@ -68,10 +68,10 @@ Run on device via XCode:
 
 
 ## Credits
-Graphics: [Kenney Free Game Assets](https://kenney.nl/) <br>
-Logo: [LogoMakr.com](https://logomakr.com/) <br>
-Triangulator: [Unify Community Triangulator](http://wiki.unity3d.com/index.php?title=Triangulator) <br>
-Voronoi Diagram Library: [C# Delaunay Library](https://github.com/PouletFrit/csDelaunay)
+Audio/Graphics: <a href="https://kenney.nl/" target="_blank">Kenney Free Game Assets</a> <br>
+Logo: <a href="https://logomakr.com/" target="_blank">LogoMakr.com</a> <br>
+Triangulator: <a href="http://wiki.unity3d.com/index.php?title=Triangulator" target="_blank">Unify Community Triangulator</a> <br>
+Voronoi Diagram Library: <a href="https://github.com/PouletFrit/csDelaunay" target="_blank">C# Delaunay Library</a> <br>
 
 ## About the Creator
 [Portfolio](https://rvesteinsdottir.github.io/), Raisah Vesteinsdottir
