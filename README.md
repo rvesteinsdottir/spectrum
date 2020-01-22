@@ -63,11 +63,8 @@ Run on device via XCode:
 5. Select play to run 
 
 ## Screenshots
-<img src="https://user-images.githubusercontent.com/52141232/72937161-6f5e0500-3d1d-11ea-95fc-b621ccc0668e.png" alt="Spectrum Opening Window" width = 200 display="inline">
-<img src="https://user-images.githubusercontent.com/52141232/72937563-38d4ba00-3d1e-11ea-9c0a-8a0c592462f3.png" alt="Spectrum Color Picker" width = 200 display="inline"> <br>
-<img src="https://user-images.githubusercontent.com/52141232/72937483-104cc000-3d1e-11ea-9b80-d679561a0f04.png" alt="Spectrum Game Window 1" width = 200 display="inline">
-<img src="https://user-images.githubusercontent.com/52141232/72937524-28bcda80-3d1e-11ea-9428-e66f5dbaed9d.png" alt="Spectrum Game Window 2" width = 200 display="inline">
-<img src="https://user-images.githubusercontent.com/52141232/72937556-35d9c980-3d1e-11ea-831e-1ca867ddd3cf.png" alt="Spectrum Game Window 3" width = 200 display="inline">
+<img src="https://user-images.githubusercontent.com/52141232/72937161-6f5e0500-3d1d-11ea-95fc-b621ccc0668e.png" alt="Spectrum Opening Window" width = 200 display="inline"> <img src="https://user-images.githubusercontent.com/52141232/72937563-38d4ba00-3d1e-11ea-9c0a-8a0c592462f3.png" alt="Spectrum Color Picker" width = 200 display="inline"> <br>
+<img src="https://user-images.githubusercontent.com/52141232/72937483-104cc000-3d1e-11ea-9b80-d679561a0f04.png" alt="Spectrum Game Window 1" width = 200 display="inline"> <img src="https://user-images.githubusercontent.com/52141232/72937524-28bcda80-3d1e-11ea-9428-e66f5dbaed9d.png" alt="Spectrum Game Window 2" width = 200 display="inline"> <img src="https://user-images.githubusercontent.com/52141232/72937556-35d9c980-3d1e-11ea-831e-1ca867ddd3cf.png" alt="Spectrum Game Window 3" width = 200 display="inline">
 
 
 ## Credits
